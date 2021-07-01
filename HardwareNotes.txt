@@ -1,0 +1,28 @@
+- U2 - STM32F103 read from package (lasered off but still just readable).
+
+- Read out - STM32F103 Device ID - 0x414 - Flash size 512kB
+That makes it a STM32F103RET
+
+- On USB power, VCC is 3.45V measured at P3/
+* P3 Pinout * Same as standard nucleo board except for pins 4 & 5 are swapped.
+1 - VCC
+2 - SWCLK
+3 - GND
+4 - NRST
+5 - SWDIO
+
+- 12.0MHz crystal attached as main clock
+- LEDs connect to VCC with 100R resistor.
+- Switches require pullup, and the switch action grounds them.  They also have a small cap to reduce noise.
+
+* I2C *
+Clock speed about 360kHz
+I2C EEPROM - 24C08 - Address is 0x5X where the X is the addressing nibble.
+EEPROM A2 line is tied low.
+
+I2C Display
+Address is 0x3C
+Is a ssd1306 - seems to work fine with this library:
+https://github.com/afiskon/stm32-ssd1306
+
+
