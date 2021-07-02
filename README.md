@@ -9,6 +9,7 @@ Current Status:
 
 Things that need to be done:
 - High Priority stuff
+
 ~~1. Work out the DFU setup.  Currently I'm just programming with an STlink, but for this to be really useful download over the DFU interface needs to be sorted.~~
 ~~2. Work out the USB-MIDI firmware.  There's a few examples online of people replacing the USB descriptors files of the USB-VCP to create a MIDI device.  Shouldn't be too hard.~~
 
