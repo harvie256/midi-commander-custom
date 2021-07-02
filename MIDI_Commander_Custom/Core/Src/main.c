@@ -27,6 +27,8 @@
 #include "ssd1306_tests.h"
 #include <stdbool.h>
 
+#include "usbd_midi_if.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -120,7 +122,7 @@ void handleSwitches(void){
 			HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_SET);
 			sendMidiCC(13, 20, 127);
 
-			ssd1306_TestAll();
+			//ssd1306_TestAll();
 
 		} else {
 			HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_RESET);
@@ -180,15 +182,20 @@ void handleSwitches(void){
 }
 
 uint8_t midi_out_buffer[8];
+uint8_t Hold_On[4] = {0x08, 0x90, 0x40, 0x47};
 
 // note values a zero based
 void sendMidiCC(uint8_t channel, uint8_t controller_number, uint8_t controller_value){
-	midi_out_buffer[0] = 0xB0 | (channel & 0xF);
-	midi_out_buffer[1] = controller_number;
-	midi_out_buffer[2] = controller_value;
+	midi_out_buffer[0] = 0x08;
+	midi_out_buffer[1] = 0xB0 | (channel & 0xF);
+	midi_out_buffer[2] = controller_number;
+	midi_out_buffer[3] = controller_value;
 
-	HAL_UART_Transmit_DMA(&huart2, midi_out_buffer, 3);
+	HAL_UART_Transmit_DMA(&huart2, midi_out_buffer+1, 3);
+	MIDI_DataTx(midi_out_buffer, 4);
+
 }
+
 
 
 /* USER CODE END 0 */
@@ -228,6 +235,8 @@ int main(void)
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_GPIO_WritePin(USB_ID_GPIO_Port, USB_ID_Pin, GPIO_PIN_SET);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -235,7 +244,6 @@ int main(void)
   while (1)
   {
 	  handleSwitches();
-
 
     /* USER CODE END WHILE */
 
@@ -388,7 +396,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LED_C_Pin|LED_B_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LED_C_Pin|LED_B_Pin|USB_ID_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LED_D_Pin|LED_2_Pin, GPIO_PIN_RESET);
@@ -397,8 +405,8 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOB, LED_E_Pin|LED_5_Pin|LED_4_Pin|LED_3_Pin
                           |LED_1_Pin|LED_A_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LED_C_Pin LED_B_Pin */
-  GPIO_InitStruct.Pin = LED_C_Pin|LED_B_Pin;
+  /*Configure GPIO pins : LED_C_Pin LED_B_Pin USB_ID_Pin */
+  GPIO_InitStruct.Pin = LED_C_Pin|LED_B_Pin|USB_ID_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

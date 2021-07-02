@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<device name="CDJ-100S" author="Spectran" type="MIDI" decks="1" sysexid="F07E0006027D0102030400000000F7" drivername="STM32 USB MIDI">
+<button note="0x40" name="HOLD" deck="1" />
+<button note="0x41" name="TIMEMODE" deck="1" />
+<button note="0x42" name="EJECT" deck="1" />
+<button note="0x43" name="MASTERTEMPO" deck="1" />
+<button note="0x44" name="TRACKBACK" deck="1" />
+<button note="0x45" name="TRACKFORWARD" deck="1" />
+<button note="0x46" name="JET" deck="1" />
+<button note="0x47" name="ZIP" deck="1" />
+<button note="0x48" name="WAH" deck="1" />
+<button note="0x49" name="PLAY" deck="1" />
+<button note="0x4A" name="CUE" deck="1" />
+<button note="0x4B" name="SCANBACK" deck="1" />
+<button note="0x4C" name="SCANFORWARD" deck="1" />
+<slider pitch="true" name="PITCH" deck="1" />
+<jog cc="0x24" full="100" name="JOG" deck="1" />
+</device>

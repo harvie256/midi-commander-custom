@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper device="CDJ-100S" version="700" date="18/01/2019">
+  <map value="PLAY" action="play" />
+  <map value="CUE" action="cue_stop" />
+  <map value="MASTERTEMPO" action="key_lock" />
+  <map value="HOLD" action="1" />
+  <map value="TIMEMODE" action="1" />
+  <map value="EJECT" active="1" />
+  <map value="TRACKBACK" active="1" />
+  <map value="TRACKFORWARD" active="1" />
+  <map value="JET" active="1" />
+  <map value="ZIP" active="1" />
+  <map value="WAH" active="1" />
+  <map value="SCANBACK" active="1" />
+  <map value="SCANFORWARD" active="1" />
+</mapper>
