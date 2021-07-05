@@ -28,6 +28,9 @@
 #include <stdbool.h>
 
 #include "usbd_midi_if.h"
+#include "midi_defines.h"
+#include "midi_sysex_proc.h"
+
 
 /* USER CODE END Includes */
 
@@ -83,6 +86,7 @@ volatile uint16_t port_C_switches_changed = 0;
 volatile uint8_t debounce_counter = 0;
 
 
+
 void sw_scan(void){
 
 	if(debounce_counter){
@@ -112,6 +116,8 @@ void sw_scan(void){
 
 }
 
+uint8_t test_sysex[] = { 0x04, 0xf0, 0x00, 0x01, 0x04, 0x02, 0x03, 0x05, 0x05, 0xf7 };
+
 
 void handleSwitches(void){
 	if(port_A_switches_changed & SW_1_Pin){
@@ -135,11 +141,19 @@ void handleSwitches(void){
 
 		port_A_switches_changed &= ~SW_2_Pin;
 		HAL_GPIO_TogglePin(LED_2_GPIO_Port, LED_2_Pin);
+		sendMidiCC(13, 21, 0);
+
 	}
 
 	if(port_A_switches_changed & SW_E_Pin){
 		port_A_switches_changed &= ~SW_E_Pin;
 		HAL_GPIO_TogglePin(LED_E_GPIO_Port, LED_E_Pin);
+
+		if(!HAL_GPIO_ReadPin(SW_E_GPIO_Port, SW_E_Pin)){
+
+			MIDI_DataTx(test_sysex, 10);
+		}
+
 	}
 
 	if(port_A_switches_changed & SW_D_Pin){
@@ -182,11 +196,11 @@ void handleSwitches(void){
 }
 
 uint8_t midi_out_buffer[8];
-uint8_t Hold_On[4] = {0x08, 0x90, 0x40, 0x47};
+//uint8_t Hold_On[4] = {0x08, 0x90, 0x40, 0x47};
 
 // note values a zero based
 void sendMidiCC(uint8_t channel, uint8_t controller_number, uint8_t controller_value){
-	midi_out_buffer[0] = 0x08;
+	midi_out_buffer[0] = CIN_CONTROL_CHANGE;
 	midi_out_buffer[1] = 0xB0 | (channel & 0xF);
 	midi_out_buffer[2] = controller_number;
 	midi_out_buffer[3] = controller_value;
@@ -197,7 +211,7 @@ void sendMidiCC(uint8_t channel, uint8_t controller_number, uint8_t controller_v
 }
 
 
-
+uint8_t testmem[1024];
 /* USER CODE END 0 */
 
 /**
@@ -234,8 +248,14 @@ int main(void)
   MX_I2C1_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
+  HAL_GPIO_WritePin(USB_ID_GPIO_Port, USB_ID_Pin, GPIO_PIN_RESET);
+  HAL_Delay(1000);
 
   HAL_GPIO_WritePin(USB_ID_GPIO_Port, USB_ID_Pin, GPIO_PIN_SET);
+
+//  uint16_t address = 0x320;
+//  uint8_t data[] = {1,2,3,4,5,6,7,8};
+//  HAL_I2C_Mem_Write(&hi2c1, 0xA0 | ((address & 0x0300) >> 7), (address & 0xff), I2C_MEMADD_SIZE_8BIT, data, 8, 100);
 
   /* USER CODE END 2 */
 
@@ -244,6 +264,9 @@ int main(void)
   while (1)
   {
 	  handleSwitches();
+//	  dump_eeprom_to_sysex();
+
+	  //sendMidiCC(13, 20, 127);
 
     /* USER CODE END WHILE */
 

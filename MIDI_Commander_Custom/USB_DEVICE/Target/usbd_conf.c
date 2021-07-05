@@ -78,9 +78,9 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef* pcdHandle)
     __HAL_RCC_USB_CLK_ENABLE();
 
     /* Peripheral interrupt init */
-    HAL_NVIC_SetPriority(USB_HP_CAN1_TX_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(USB_HP_CAN1_TX_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(USB_HP_CAN1_TX_IRQn);
-    HAL_NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(USB_LP_CAN1_RX0_IRQn);
   /* USER CODE BEGIN USB_MspInit 1 */
 
@@ -334,8 +334,13 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
   HAL_PCD_RegisterIsoInIncpltCallback(&hpcd_USB_FS, PCD_ISOINIncompleteCallback);
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
   /* USER CODE BEGIN EndPoint_Configuration */
+
+  // Setup the PMA address areas for both control endpoints and the MIDI bulk endpoints
   HAL_PCDEx_PMAConfig((PCD_HandleTypeDef*)pdev->pData , 0x00 , PCD_SNG_BUF, 0x18);
   HAL_PCDEx_PMAConfig((PCD_HandleTypeDef*)pdev->pData , 0x80 , PCD_SNG_BUF, 0x58);
+
+  HAL_PCDEx_PMAConfig((PCD_HandleTypeDef*)pdev->pData , 0x01 , PCD_SNG_BUF, (0x58 + 0x40));
+  HAL_PCDEx_PMAConfig((PCD_HandleTypeDef*)pdev->pData , 0x81 , PCD_SNG_BUF, (0x58 + 0x40 + 0x40));
   /* USER CODE END EndPoint_Configuration */
   return USBD_OK;
 }

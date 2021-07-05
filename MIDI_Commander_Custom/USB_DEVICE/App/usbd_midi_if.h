@@ -31,8 +31,8 @@ extern void sendNoteOff(uint8_t ch, uint8_t note);
 extern void sendCtlChange(uint8_t ch, uint8_t num, uint8_t value);
 
 // Call in main loop
-extern void processMidiMessage(void);
-extern void USBD_MIDI_SendPacket(void);
+void USBD_MIDI_SendPacket (uint8_t* buffer, uint8_t len);
+//extern void USBD_MIDI_SendPacket(void);
 
 uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length);
 uint16_t MIDI_DataTx(uint8_t *msg, uint16_t length);

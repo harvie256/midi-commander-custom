@@ -31,6 +31,7 @@ uint8_t  USB_Tx_State = 0;
 __ALIGN_BEGIN uint8_t USB_Rx_Buffer[MIDI_DATA_OUT_PACKET_SIZE] __ALIGN_END ;
 __ALIGN_BEGIN uint8_t APP_Rx_Buffer[APP_RX_DATA_SIZE] __ALIGN_END ;
 
+
 /* USB Standard Device Descriptor */
 /*
 __ALIGN_BEGIN static uint8_t USBD_MIDI_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIER_DESC] __ALIGN_END =
@@ -100,6 +101,10 @@ static uint8_t USBD_MIDI_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx){
   pInstance = pdev;
   USBD_LL_OpenEP(pdev,MIDI_IN_EP,USBD_EP_TYPE_BULK,MIDI_DATA_IN_PACKET_SIZE);
   USBD_LL_OpenEP(pdev,MIDI_OUT_EP,USBD_EP_TYPE_BULK,MIDI_DATA_OUT_PACKET_SIZE);
+
+  pdev->ep_out[MIDI_OUT_EP & 0xFU].is_used = 1U;
+  pdev->ep_in[MIDI_IN_EP & 0xFU].is_used = 1U;
+
   USBD_LL_PrepareReceive(pdev,MIDI_OUT_EP,(uint8_t*)(USB_Rx_Buffer),MIDI_DATA_OUT_PACKET_SIZE);
   return 0;
 }
@@ -128,46 +133,52 @@ static uint8_t  USBD_MIDI_DataOut (USBD_HandleTypeDef *pdev, uint8_t epnum)
 
   USB_Rx_Cnt = ((PCD_HandleTypeDef*)pdev->pData)->OUT_ep[epnum].xfer_count;
 
-  pmidi->pIf_MidiRx((uint8_t *)&USB_Rx_Buffer, USB_Rx_Cnt);
+  pmidi->pIf_MidiRx(USB_Rx_Buffer, USB_Rx_Cnt);
 
-  USBD_LL_PrepareReceive(pdev,MIDI_OUT_EP,(uint8_t*)(USB_Rx_Buffer),MIDI_DATA_OUT_PACKET_SIZE);
+  USBD_LL_PrepareReceive(pdev,MIDI_OUT_EP,USB_Rx_Buffer,MIDI_DATA_OUT_PACKET_SIZE);
   return USBD_OK;
 }
 
-void USBD_MIDI_SendPacket (){
+
+
+void USBD_MIDI_SendPacket (uint8_t* buffer, uint8_t len){
   uint16_t USB_Tx_ptr;
   uint16_t USB_Tx_length;
 
+
+
   if(USB_Tx_State != 1){
-    if (APP_Rx_ptr_out == APP_RX_DATA_SIZE){
-      APP_Rx_ptr_out = 0;
-    }
-
-    if(APP_Rx_ptr_out == APP_Rx_ptr_in){
-      USB_Tx_State = 0;
-      return;
-    }
-
-    if(APP_Rx_ptr_out > APP_Rx_ptr_in){
-      APP_Rx_length = APP_RX_DATA_SIZE - APP_Rx_ptr_out;
-    }else{
-      APP_Rx_length = APP_Rx_ptr_in - APP_Rx_ptr_out;
-    }
-
-    if (APP_Rx_length > MIDI_DATA_IN_PACKET_SIZE){
-      USB_Tx_ptr = APP_Rx_ptr_out;
-      USB_Tx_length = MIDI_DATA_IN_PACKET_SIZE;
-      APP_Rx_ptr_out += MIDI_DATA_IN_PACKET_SIZE;
-      APP_Rx_length -= MIDI_DATA_IN_PACKET_SIZE;
-    }else{
-      USB_Tx_ptr = APP_Rx_ptr_out;
-      USB_Tx_length = APP_Rx_length;
-      APP_Rx_ptr_out += APP_Rx_length;
-      APP_Rx_length = 0;
-    }
+//    if (APP_Rx_ptr_out == APP_RX_DATA_SIZE){
+//      APP_Rx_ptr_out = 0;
+//    }
+//
+//    if(APP_Rx_ptr_out == APP_Rx_ptr_in){
+//      USB_Tx_State = 0;
+//      return;
+//    }
+//
+//    if(APP_Rx_ptr_out > APP_Rx_ptr_in){
+//      APP_Rx_length = APP_RX_DATA_SIZE - APP_Rx_ptr_out;
+//    }else{
+//      APP_Rx_length = APP_Rx_ptr_in - APP_Rx_ptr_out;
+//    }
+//
+//    if (APP_Rx_length > MIDI_DATA_IN_PACKET_SIZE){
+//      USB_Tx_ptr = APP_Rx_ptr_out;
+//      USB_Tx_length = MIDI_DATA_IN_PACKET_SIZE;
+//      APP_Rx_ptr_out += MIDI_DATA_IN_PACKET_SIZE;
+//      APP_Rx_length -= MIDI_DATA_IN_PACKET_SIZE;
+//    }else{
+//      USB_Tx_ptr = APP_Rx_ptr_out;
+//      USB_Tx_length = APP_Rx_length;
+//      APP_Rx_ptr_out += APP_Rx_length;
+//      APP_Rx_length = 0;
+//    }
     USB_Tx_State = 1;
-    while(USBD_LL_Transmit(pInstance,
-    		MIDI_IN_EP,(uint8_t*)&APP_Rx_Buffer[USB_Tx_ptr],USB_Tx_length) != USBD_OK);
+//    while(USBD_LL_Transmit(pInstance, MIDI_IN_EP,(APP_Rx_Buffer + USB_Tx_ptr),USB_Tx_length) != USBD_OK)
+//    	;
+    while(USBD_LL_Transmit(pInstance, MIDI_IN_EP,buffer,len) != USBD_OK)
+    	;
   }
 }
 
