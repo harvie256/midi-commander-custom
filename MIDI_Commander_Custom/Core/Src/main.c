@@ -26,10 +26,8 @@
 #include "ssd1306.h"
 #include "ssd1306_tests.h"
 #include <stdbool.h>
-
 #include "usbd_midi_if.h"
 #include "midi_defines.h"
-#include "midi_sysex_proc.h"
 
 
 /* USER CODE END Includes */
@@ -85,6 +83,12 @@ volatile uint16_t port_C_switches_changed = 0;
 
 volatile uint8_t debounce_counter = 0;
 
+/*
+ * Switch toggle stage is stored for each switch, on each page.
+ * Each byte represents a page, and the bits represent the switch stage.
+ */
+uint8_t switch_toggle_state[8] = {0};
+uint8_t switch_current_page = 0;
 
 
 void sw_scan(void){
@@ -116,19 +120,16 @@ void sw_scan(void){
 
 }
 
-uint8_t test_sysex[] = { 0x04, 0xf0, 0x00, 0x01, 0x04, 0x02, 0x03, 0x05, 0x05, 0xf7 };
-
 
 void handleSwitches(void){
 	if(port_A_switches_changed & SW_1_Pin){
 
 		port_A_switches_changed &= ~SW_1_Pin;
 
+
 		if(!HAL_GPIO_ReadPin(SW_1_GPIO_Port, SW_1_Pin)){
 			HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_SET);
 			sendMidiCC(13, 20, 127);
-
-			//ssd1306_TestAll();
 
 		} else {
 			HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_RESET);
@@ -138,8 +139,8 @@ void handleSwitches(void){
 	}
 
 	if(port_A_switches_changed & SW_2_Pin){
-
 		port_A_switches_changed &= ~SW_2_Pin;
+
 		HAL_GPIO_TogglePin(LED_2_GPIO_Port, LED_2_Pin);
 		sendMidiCC(13, 21, 0);
 
@@ -150,8 +151,6 @@ void handleSwitches(void){
 		HAL_GPIO_TogglePin(LED_E_GPIO_Port, LED_E_Pin);
 
 		if(!HAL_GPIO_ReadPin(SW_E_GPIO_Port, SW_E_Pin)){
-
-			MIDI_DataTx(test_sysex, 10);
 		}
 
 	}
