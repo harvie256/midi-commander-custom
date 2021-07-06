@@ -1,15 +1,10 @@
 /*
  *
  * EEPROM Routines taken in part form Github - nimaltd/ee24
- *
- * MIDI USB Class and routines started off with Github - spectran/stm32f103-usb-midi
- * but many issues were found resulting a quite a lot of the data handling being modified.
- *
  */
 
 #include "usbd_midi_if.h"
 #include "stm32f1xx_hal.h"
-#include "midi_sysex_proc.h"
 #include "midi_defines.h"
 #include <string.h>
 
@@ -20,6 +15,7 @@ extern I2C_HandleTypeDef hi2c1;
 uint8_t sysex_rx_buffer[SYSEX_MAX_LENGTH];
 uint8_t sysex_rx_counter = 0;
 uint8_t sysex_tx_assembly_buffer[SYSEX_MAX_LENGTH+32];
+
 uint8_t midi_msg_tx_buffer[SYSEX_MAX_LENGTH];
 
 typedef struct {
@@ -126,26 +122,24 @@ void sysex_dump_eeprom_page(uint8_t page_number){
 	midi_msg_tx_buffer[3] = page_number;
 
 	uint16_t ee_byte_address = page_number * 16;
+
 	HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c1, 0xA0 | ((ee_byte_address & 0x0300) >> 7), (ee_byte_address & 0xff), I2C_MEMADD_SIZE_8BIT, eeprom_buffer, 16, 100);
 
 	if(status == HAL_OK){
 		// Because we cannot use the high bit in each byte for a midi packet, we need to break it down.
-		// Easiest (and perhaps lasy way) is to break each byte into two nibbles, so that's what we're doing.
+		// Easiest (and perhaps lasy way) is to break each byte into two nibbles.
 
 		for(int i=0; i<16; i++){
 			midi_msg_tx_buffer[4+(i*2)] = eeprom_buffer[i] >> 4;
 			midi_msg_tx_buffer[4+(i*2)+1] = eeprom_buffer[i] & 0x0F;
 		}
 
-
 		midi_msg_tx_buffer[4+32] = SYSEX_END;
-
 		sysex_send_message(midi_msg_tx_buffer, 37);
 	}
 }
 
 void process_sysex_message(void){
-
 	// Check start and end bytes
 	if(sysex_rx_buffer[0] != SYSEX_START ||
 			sysex_rx_buffer[sysex_rx_counter -1] != SYSEX_END){
@@ -175,9 +169,7 @@ void process_sysex_message(void){
 		break;
 	}
 
-
 	sysex_rx_counter = 0;
-
 }
 
 uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length)
@@ -222,6 +214,10 @@ uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length)
 			sysex_rx_counter += 3;
 			processed_data_cnt += 4;
 			process_sysex_message();
+			break;
+
+		case CIN_SINGLE_BYTE:
+			// Realtime messages, like sync, if enabled send through to serial midi port.
 			break;
 
 		default:
@@ -364,6 +360,9 @@ uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length)
 	  break;
   case 0xF0: {
 
+
+
+
 	  break;
   }
   }
@@ -372,6 +371,15 @@ uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length)
 
 uint16_t MIDI_DataTx(uint8_t *msg, uint16_t length)
 {
+//  uint32_t i = 0;
+//  while (i < length) {
+//    APP_Rx_Buffer[APP_Rx_ptr_in] = *(msg + i);
+//    APP_Rx_ptr_in++;
+//    i++;
+//    if (APP_Rx_ptr_in == APP_RX_DATA_SIZE) {
+//      APP_Rx_ptr_in = 0;
+//    }
+//  }
   USBD_MIDI_SendPacket(msg, length);
   return USBD_OK;
 }
