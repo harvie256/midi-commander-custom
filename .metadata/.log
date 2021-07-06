@@ -1191,3 +1191,1153 @@ Reason: (4) No device found on target.
 !SUBENTRY 2 com.st.stm32cube.ide.mcu.debug.stlink 4 0 2021-07-05 14:33:47.931
 !MESSAGE Error in initializing ST-LINK device.
 Reason: (4) No device found on target.
+!SESSION 2021-07-06 17:29:29.638 -----------------------------------------------
+eclipse.buildId=Version 1.6.1
+java.version=11.0.9.1
+java.vendor=AdoptOpenJDK
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_AU
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2021-07-06 17:29:36.836
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2021-07-06 17:29:36.887
+!MESSAGE Log4j initialized with config file D:\midi-commander-custom\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2021-07-06 17:29:47.237
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 4 4 2021-07-06 17:29:47.825
+!MESSAGE com.st.stm32cube.ide.mcu.ide/META-INF/version/build_ref file not found, build reference will not be reported into properties
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.690
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.690
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.691
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.691
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.691
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.692
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.692
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.692
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.693
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.693
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.693
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.694
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlushBuffer(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implFlush(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.flush(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.flush(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.694
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.694
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.694
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.695
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.695
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.695
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.695
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.696
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.696
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.696
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.697
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.697
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.697
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.697
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.698
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.698
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.698
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.699
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.699
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.699
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.699
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.700
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.700
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.700
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.701
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.701
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.701
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.701
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.702
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 2 0 2021-07-06 17:30:14.702
+!MESSAGE Error while determining symbol addresses
+!STACK 0
+java.io.IOException: T
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write0(Native Method)
+	at org.eclipse.cdt.utils.spawner.SpawnerOutputStream.write(SpawnerOutputStream.java:48)
+	at java.base/sun.nio.cs.StreamEncoder.writeBytes(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.implWrite(Unknown Source)
+	at java.base/sun.nio.cs.StreamEncoder.write(Unknown Source)
+	at java.base/java.io.OutputStreamWriter.write(Unknown Source)
+	at java.base/java.io.BufferedWriter.flushBuffer(Unknown Source)
+	at java.base/java.io.BufferedWriter.flush(Unknown Source)
+	at org.eclipse.cdt.utils.Addr2line.getOutput(Addr2line.java:64)
+	at org.eclipse.cdt.utils.Addr2line.getLine(Addr2line.java:72)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$6(StackAnalyzerView.java:864)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(Unknown Source)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(Unknown Source)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source)
+	at java.base/java.util.stream.ReferencePipeline.collect(Unknown Source)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:874)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)
+
+!ENTRY com.st.stm32cube.ide.mcu.stackanalyzer 4 0 2021-07-06 17:30:14.732
+!MESSAGE Stackanalyzer failed to analyze input
+!STACK 0
+java.lang.Exception: File: D:\midi-commander-custom\MIDI_Commander_Custom\Debug\MIDI_Commander_Custom.elfdo not exists
+	at com.st.stm32cube.ide.mcu.utils.assembly.Disassembler.<init>(Disassembler.java:59)
+	at com.st.stm32cube.ide.mcu.utils.assembly.Disassembler.<init>(Disassembler.java:87)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.inputChanged(StackAnalyzerView.java:902)
+	at com.st.stm32cube.ide.mcu.stackanalyzer.ui.StackAnalyzerView.lambda$14(StackAnalyzerView.java:1187)
+	at java.base/java.lang.Thread.run(Unknown Source)

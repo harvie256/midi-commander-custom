@@ -1,16 +1,15 @@
-15:48:55 **** Incremental Build of configuration Debug for project MIDI_Commander_Custom ****
+16:46:19 **** Incremental Build of configuration Debug for project MIDI_Commander_Custom ****
 make -j24 all 
 arm-none-eabi-gcc "../USB_DEVICE/App/usbd_midi_if.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I"D:/midi-commander-custom/MIDI_Commander_Custom/Middlewares/stm32-ssd1306-master/ssd1306" -I../USB_DEVICE/App -I../USB_DEVICE/Target -I../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Device_Library/Class/AUDIO/Inc -I"D:/midi-commander-custom/MIDI_Commander_Custom/Middlewares/ST/STM32_USB_Device_Library/Class/MIDI/Inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"USB_DEVICE/App/usbd_midi_if.d" -MT"USB_DEVICE/App/usbd_midi_if.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "USB_DEVICE/App/usbd_midi_if.o"
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I"D:/midi-commander-custom/MIDI_Commander_Custom/Middlewares/stm32-ssd1306-master/ssd1306" -I../USB_DEVICE/App -I../USB_DEVICE/Target -I../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Device_Library/Class/AUDIO/Inc -I"D:/midi-commander-custom/MIDI_Commander_Custom/Middlewares/ST/STM32_USB_Device_Library/Class/MIDI/Inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
 ../USB_DEVICE/App/usbd_midi_if.c: In function 'MIDI_DataRx':
-../USB_DEVICE/App/usbd_midi_if.c:241:11: warning: unused variable 'b' [-Wunused-variable]
-  241 |  uint16_t b = ((b2 & 0x7F) << 7) | (b1 & 0x7F);
+../USB_DEVICE/App/usbd_midi_if.c:240:11: warning: unused variable 'b' [-Wunused-variable]
+  240 |  uint16_t b = ((b2 & 0x7F) << 7) | (b1 & 0x7F);
       |           ^
-../USB_DEVICE/App/usbd_midi_if.c:237:10: warning: unused variable 'chan' [-Wunused-variable]
-  237 |  uint8_t chan = msg[1] & 0x0F;
+../USB_DEVICE/App/usbd_midi_if.c:236:10: warning: unused variable 'chan' [-Wunused-variable]
+  236 |  uint8_t chan = msg[1] & 0x0F;
       |          ^~~~
-../USB_DEVICE/App/usbd_midi_if.c:183:10: warning: unused variable 'cable' [-Wunused-variable]
-  183 |  uint8_t cable = (msg[0]>>4) & 0xF;
+../USB_DEVICE/App/usbd_midi_if.c:182:10: warning: unused variable 'cable' [-Wunused-variable]
+  182 |  uint8_t cable = (msg[0]>>4) & 0xF;
       |          ^~~~~
 arm-none-eabi-gcc -o "MIDI_Commander_Custom.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\midi-commander-custom\MIDI_Commander_Custom\STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MIDI_Commander_Custom.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MIDI_Commander_Custom.elf
@@ -19,32 +18,25 @@ arm-none-eabi-objdump -h -S  MIDI_Commander_Custom.elf  > "MIDI_Commander_Custom
 arm-none-eabi-objcopy  -O binary  MIDI_Commander_Custom.elf  "MIDI_Commander_Custom.bin"
 arm-none-eabi-size   MIDI_Commander_Custom.elf 
    text	   data	    bss	    dec	    hex	filename
-  40344	    288	  16104	  56736	   dda0	MIDI_Commander_Custom.elf
+  40416	    288	  16104	  56808	   dde8	MIDI_Commander_Custom.elf
 Finished building: default.size.stdout
  
 Finished building: MIDI_Commander_Custom.bin
  
 Finished building: MIDI_Commander_Custom.list
  
-15:51:27 **** Incremental Build of configuration Debug for project MIDI_Commander_Custom ****
-make -j24 all 
-arm-none-eabi-size   MIDI_Commander_Custom.elf 
-   text	   data	    bss	    dec	    hex	filename
-  40344	    288	  16104	  56736	   dda0	MIDI_Commander_Custom.elf
-Finished building: default.size.stdout
- 
-16:21:17 **** Incremental Build of configuration Debug for project MIDI_Commander_Custom ****
+17:30:14 **** Incremental Build of configuration Debug for project MIDI_Commander_Custom ****
 make -j24 all 
 arm-none-eabi-gcc "../USB_DEVICE/App/usbd_midi_if.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I"D:/midi-commander-custom/MIDI_Commander_Custom/Middlewares/stm32-ssd1306-master/ssd1306" -I../USB_DEVICE/App -I../USB_DEVICE/Target -I../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Device_Library/Class/AUDIO/Inc -I"D:/midi-commander-custom/MIDI_Commander_Custom/Middlewares/ST/STM32_USB_Device_Library/Class/MIDI/Inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"USB_DEVICE/App/usbd_midi_if.d" -MT"USB_DEVICE/App/usbd_midi_if.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "USB_DEVICE/App/usbd_midi_if.o"
 ../USB_DEVICE/App/usbd_midi_if.c: In function 'MIDI_DataRx':
-../USB_DEVICE/App/usbd_midi_if.c:248:11: warning: unused variable 'b' [-Wunused-variable]
-  248 |  uint16_t b = ((b2 & 0x7F) << 7) | (b1 & 0x7F);
+../USB_DEVICE/App/usbd_midi_if.c:244:11: warning: unused variable 'b' [-Wunused-variable]
+  244 |  uint16_t b = ((b2 & 0x7F) << 7) | (b1 & 0x7F);
       |           ^
-../USB_DEVICE/App/usbd_midi_if.c:244:10: warning: unused variable 'chan' [-Wunused-variable]
-  244 |  uint8_t chan = msg[1] & 0x0F;
+../USB_DEVICE/App/usbd_midi_if.c:240:10: warning: unused variable 'chan' [-Wunused-variable]
+  240 |  uint8_t chan = msg[1] & 0x0F;
       |          ^~~~
-../USB_DEVICE/App/usbd_midi_if.c:190:10: warning: unused variable 'cable' [-Wunused-variable]
-  190 |  uint8_t cable = (msg[0]>>4) & 0xF;
+../USB_DEVICE/App/usbd_midi_if.c:186:10: warning: unused variable 'cable' [-Wunused-variable]
+  186 |  uint8_t cable = (msg[0]>>4) & 0xF;
       |          ^~~~~
 arm-none-eabi-gcc -o "MIDI_Commander_Custom.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\midi-commander-custom\MIDI_Commander_Custom\STM32F103RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MIDI_Commander_Custom.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MIDI_Commander_Custom.elf

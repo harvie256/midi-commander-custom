@@ -1,6 +1,10 @@
 /*
  *
  * EEPROM Routines taken in part form Github - nimaltd/ee24
+ *
+ * MIDI USB Class and routines started off with Github - spectran/stm32f103-usb-midi
+ * but many issues were found resulting a quite a lot of the data handling being modified.
+ *
  */
 
 #include "usbd_midi_if.h"
@@ -121,20 +125,12 @@ void sysex_dump_eeprom_page(uint8_t page_number){
 	midi_msg_tx_buffer[2] = SYSEX_RSP_DUMP_EEPROM;
 	midi_msg_tx_buffer[3] = page_number;
 
-	// Load the EEPROM Page
-//	for(int i=0; i<16; i++){
-//		midi_msg_tx_buffer[4 + i] = i;
-//	}
-
 	uint16_t ee_byte_address = page_number * 16;
-//	uint16_t ee_segment_address = ee_byte_address >> 7;
-//
-//	uint8_t eeprom_address = 0xA0 + (ee_segment_address << 1);
 	HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c1, 0xA0 | ((ee_byte_address & 0x0300) >> 7), (ee_byte_address & 0xff), I2C_MEMADD_SIZE_8BIT, eeprom_buffer, 16, 100);
 
 	if(status == HAL_OK){
 		// Because we cannot use the high bit in each byte for a midi packet, we need to break it down.
-		// Easiest (and perhaps lasy way) is to break each byte into two nibbles.
+		// Easiest (and perhaps lasy way) is to break each byte into two nibbles, so that's what we're doing.
 
 		for(int i=0; i<16; i++){
 			midi_msg_tx_buffer[4+(i*2)] = eeprom_buffer[i] >> 4;
@@ -368,9 +364,6 @@ uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length)
 	  break;
   case 0xF0: {
 
-
-
-
 	  break;
   }
   }
@@ -379,15 +372,6 @@ uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length)
 
 uint16_t MIDI_DataTx(uint8_t *msg, uint16_t length)
 {
-//  uint32_t i = 0;
-//  while (i < length) {
-//    APP_Rx_Buffer[APP_Rx_ptr_in] = *(msg + i);
-//    APP_Rx_ptr_in++;
-//    i++;
-//    if (APP_Rx_ptr_in == APP_RX_DATA_SIZE) {
-//      APP_Rx_ptr_in = 0;
-//    }
-//  }
   USBD_MIDI_SendPacket(msg, length);
   return USBD_OK;
 }

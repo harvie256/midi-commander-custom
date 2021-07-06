@@ -26,3 +26,4 @@ Is a ssd1306 - seems to work fine with this library:
 https://github.com/afiskon/stm32-ssd1306
 
 
+For the EEPROM, only the first 128 bytes appear to have anything in them.  This leaves 896 bytes free, starting at the 128 byte offset.
