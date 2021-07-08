@@ -51,9 +51,8 @@ for index, row in df_dic['Button_Settings'].iterrows():
     memory_bytes_list += cbp.pack_row(row)
 
 # dump out to a file
-dt_string = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
 memory_bytes = bytes(memory_bytes_list)
-with open('config_image_' + dt_string, 'wb') as f:
+with open('config_image.bin', 'wb') as f:
     f.write(memory_bytes)
 
 # File should be 896 bytes long

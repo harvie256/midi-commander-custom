@@ -5,7 +5,7 @@ MIDI_MANUF_ID = 0x7D
 
 WRITE_EEPROM = 54
 
-File_To_Write = r"D:\midi-commander-custom\python\config_image_06-07-2021_17-22-59"
+File_To_Write = r"D:\midi-commander-custom\python\config_image.bin"
 
 midi_inputs = [x for x in mido.get_input_names() if 'STM' in x]
 midi_outputs = [x for x in mido.get_output_names() if 'STM' in x]

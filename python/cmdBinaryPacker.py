@@ -1,4 +1,3 @@
-import pandas as pd
 
 CMD_NO_CMD_NIBBLE = 0x00
 CMD_PC_NIBBLE = 0xC0
@@ -18,7 +17,7 @@ CMD_STOP_NIBBLE = 0x20
 
 def get_toggle_bit(toggle_str):
     if 'Y' in toggle_str:
-        return 0x08
+        return 0x80
     else:
         return 0
 
@@ -32,7 +31,7 @@ def cmd_pc(cmd):
         bank_select_high = 0x80
     
     cmd_bytes = [
-        CMD_PC_NIBBLE | int(cmd['Channel_(PC/CC/Note/PB)']), # Command and channel
+        CMD_PC_NIBBLE | int(cmd['Channel_(PC/CC/Note/PB)'] - 1), # Command and channel
         int(cmd['Number_(PC/CC/Note)']) & 0x7F, # Patch number
         bank_select_high,
         bank_select_low
@@ -43,7 +42,7 @@ def cmd_pc(cmd):
 
 def cmd_cc(cmd):
     cmd_bytes = [
-        CMD_CC_NIBBLE | int(cmd['Channel_(PC/CC/Note/PB)']), # Command and channel
+        CMD_CC_NIBBLE | int(cmd['Channel_(PC/CC/Note/PB)'] - 1), # Command and channel
         int(cmd['Number_(PC/CC/Note)']) & 0x7F | \
             get_toggle_bit(cmd['Toggle_(CC/PB/Note)']), # command number & toggle
         int(cmd['OnValue_(CC/PB)']) & 0x7F,
@@ -54,7 +53,7 @@ def cmd_cc(cmd):
 
 def cmd_note(cmd):
     cmd_bytes = [
-        CMD_NOTE_NIBBLE | int(cmd['Channel_(PC/CC/Note/PB)']), # Command and channel
+        CMD_NOTE_NIBBLE | int(cmd['Channel_(PC/CC/Note/PB)'] - 1), # Command and channel
         int(cmd['Number_(PC/CC/Note)']) & 0x7F | \
             get_toggle_bit(cmd['Toggle_(CC/PB/Note)']), # note number & toggle
         int(cmd['Velocity_(Note)']) & 0x7F,
@@ -64,11 +63,22 @@ def cmd_note(cmd):
     
     
 def cmd_pb(cmd):
+    center_pitch = 0x2000
+    # The pitch in the CSV file will be -8192 to 8191, this needs to be centered
+    # around 0x2000
+    
+    if -8192 > cmd['OnValue_(CC/PB)'] > 8191:
+        raise ValueError('PB outside of range: ', cmd['OnValue_(CC/PB)'])
+    
+    pitch = int(cmd['OnValue_(CC/PB)'] + 0x2000)
+    
+    pitch_LSB = pitch & 0x7F
+    pitch_MSB = (pitch >> 7) & 0x7F 
+    
     cmd_bytes = [
-        CMD_PB_NIBBLE | int(cmd['Channel_(PC/CC/Note/PB)']), # Command and channel
-        (int(cmd['OnValue_(CC/PB)']) >> 7) & 0x7F | \
-            get_toggle_bit(cmd['Toggle_(CC/PB/Note)']), # high byte of value & toggle
-        int(cmd['OnValue_(CC/PB)']) & 0x7F,
+        CMD_PB_NIBBLE | int(cmd['Channel_(PC/CC/Note/PB)'] - 1), # Command and channel
+        pitch_LSB | get_toggle_bit(cmd['Toggle_(CC/PB/Note)']), # high byte of value & toggle
+        pitch_MSB,
         int(cmd['Duration_(Note/PB)']) & 0x7F
         ]
     return cmd_bytes

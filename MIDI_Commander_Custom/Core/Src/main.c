@@ -28,13 +28,14 @@
 #include <stdbool.h>
 #include "usbd_midi_if.h"
 #include "midi_defines.h"
-
+#include "eeprom_midi_settings.h"
+#include "midi_cmds.h"
+#include "switch_router.h"
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-void sendMidiCC(uint8_t channel, uint8_t controller_number, uint8_t controller_value);
 
 /* USER CODE END PTD */
 
@@ -54,6 +55,7 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
+uint8_t f_sys_config_complete = 0;
 
 /* USER CODE END PV */
 
@@ -70,147 +72,8 @@ static void MX_I2C1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-#define SW_PORTA_MASK (SW_1_Pin | SW_2_Pin | SW_E_Pin | SW_D_Pin | SW_C_Pin)
-#define SW_PORTB_MASK (SW_A_Pin | SW_3_Pin | SW_4_Pin | SW_5_Pin)
-#define SW_PORTC_MASK (SW_B_Pin)
-
-uint16_t port_A_previous_state = SW_PORTA_MASK; // All pins will be high un-pressed
-volatile uint16_t port_A_switches_changed = 0;
-uint16_t port_B_previous_state = SW_PORTB_MASK; // All pins will be high un-pressed
-volatile uint16_t port_B_switches_changed = 0;
-uint16_t port_C_previous_state = SW_PORTC_MASK; // All pins will be high un-pressed
-volatile uint16_t port_C_switches_changed = 0;
-
-volatile uint8_t debounce_counter = 0;
-
-/*
- * Switch toggle stage is stored for each switch, on each page.
- * Each byte represents a page, and the bits represent the switch stage.
- */
-uint8_t switch_toggle_state[8] = {0};
-uint8_t switch_current_page = 0;
 
 
-void sw_scan(void){
-
-	if(debounce_counter){
-		debounce_counter--;
-		return;
-	}
-
-	/* PORTA input pins */
-	uint16_t current_port_A = GPIOA->IDR & SW_PORTA_MASK;
-	port_A_switches_changed |= current_port_A  ^ port_A_previous_state;
-	port_A_previous_state = current_port_A;
-
-	/* PORTB input pins */
-	uint16_t current_port_B = GPIOB->IDR & SW_PORTB_MASK;
-	port_B_switches_changed |= current_port_B  ^ port_B_previous_state;
-	port_B_previous_state = current_port_B;
-
-	/* PORTC input pins */
-	uint16_t current_port_C = GPIOC->IDR & SW_PORTC_MASK;
-	port_C_switches_changed |= current_port_C  ^ port_C_previous_state;
-	port_C_previous_state = current_port_C;
-
-	if(port_A_switches_changed | port_B_switches_changed | port_C_switches_changed){
-		debounce_counter = 10; // 10ms debounce delay
-		return;
-	}
-
-}
-
-
-void handleSwitches(void){
-	if(port_A_switches_changed & SW_1_Pin){
-
-		port_A_switches_changed &= ~SW_1_Pin;
-
-
-		if(!HAL_GPIO_ReadPin(SW_1_GPIO_Port, SW_1_Pin)){
-			HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_SET);
-			sendMidiCC(13, 20, 127);
-
-		} else {
-			HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_RESET);
-			sendMidiCC(13, 20, 0);
-		}
-
-	}
-
-	if(port_A_switches_changed & SW_2_Pin){
-		port_A_switches_changed &= ~SW_2_Pin;
-
-		HAL_GPIO_TogglePin(LED_2_GPIO_Port, LED_2_Pin);
-		sendMidiCC(13, 21, 0);
-
-	}
-
-	if(port_A_switches_changed & SW_E_Pin){
-		port_A_switches_changed &= ~SW_E_Pin;
-		HAL_GPIO_TogglePin(LED_E_GPIO_Port, LED_E_Pin);
-
-		if(!HAL_GPIO_ReadPin(SW_E_GPIO_Port, SW_E_Pin)){
-		}
-
-	}
-
-	if(port_A_switches_changed & SW_D_Pin){
-		port_A_switches_changed &= ~SW_D_Pin;
-		HAL_GPIO_TogglePin(LED_D_GPIO_Port, LED_D_Pin);
-	}
-
-	if(port_A_switches_changed & SW_C_Pin){
-		port_A_switches_changed &= ~SW_C_Pin;
-		HAL_GPIO_TogglePin(LED_C_GPIO_Port, LED_C_Pin);
-	}
-
-	if(port_B_switches_changed & SW_A_Pin){
-		port_B_switches_changed &= ~SW_A_Pin;
-		HAL_GPIO_TogglePin(LED_A_GPIO_Port, LED_A_Pin);
-	}
-
-	if(port_B_switches_changed & SW_3_Pin){
-		port_B_switches_changed &= ~SW_3_Pin;
-		HAL_GPIO_TogglePin(LED_3_GPIO_Port, LED_3_Pin);
-	}
-
-	if(port_B_switches_changed & SW_4_Pin){
-		port_B_switches_changed &= ~SW_4_Pin;
-		HAL_GPIO_TogglePin(LED_4_GPIO_Port, LED_4_Pin);
-	}
-
-	if(port_B_switches_changed & SW_5_Pin){
-		port_B_switches_changed &= ~SW_5_Pin;
-		HAL_GPIO_TogglePin(LED_5_GPIO_Port, LED_5_Pin);
-	}
-
-	if(port_C_switches_changed & SW_B_Pin){
-		port_C_switches_changed &= ~SW_B_Pin;
-		HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
-	}
-
-
-
-}
-
-uint8_t midi_out_buffer[8];
-//uint8_t Hold_On[4] = {0x08, 0x90, 0x40, 0x47};
-
-// note values a zero based
-void sendMidiCC(uint8_t channel, uint8_t controller_number, uint8_t controller_value){
-	midi_out_buffer[0] = CIN_CONTROL_CHANGE;
-	midi_out_buffer[1] = 0xB0 | (channel & 0xF);
-	midi_out_buffer[2] = controller_number;
-	midi_out_buffer[3] = controller_value;
-
-	HAL_UART_Transmit_DMA(&huart2, midi_out_buffer+1, 3);
-	MIDI_DataTx(midi_out_buffer, 4);
-
-}
-
-
-uint8_t testmem[1024];
 /* USER CODE END 0 */
 
 /**
@@ -247,14 +110,17 @@ int main(void)
   MX_I2C1_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
+
+  // Reset the USB interface in case it's still plugged in.
   HAL_GPIO_WritePin(USB_ID_GPIO_Port, USB_ID_Pin, GPIO_PIN_RESET);
   HAL_Delay(1000);
-
   HAL_GPIO_WritePin(USB_ID_GPIO_Port, USB_ID_Pin, GPIO_PIN_SET);
 
-//  uint16_t address = 0x320;
-//  uint8_t data[] = {1,2,3,4,5,6,7,8};
-//  HAL_I2C_Mem_Write(&hi2c1, 0xA0 | ((address & 0x0300) >> 7), (address & 0xff), I2C_MEMADD_SIZE_8BIT, data, 8, 100);
+  eeprom_load_settings();
+  sw_led_init();
+
+  HAL_Delay(200);
+  f_sys_config_complete = 1; // Don't scan switch changes until everything is init'd
 
   /* USER CODE END 2 */
 
@@ -263,9 +129,6 @@ int main(void)
   while (1)
   {
 	  handleSwitches();
-//	  dump_eeprom_to_sysex();
-
-	  //sendMidiCC(13, 20, 127);
 
     /* USER CODE END WHILE */
 

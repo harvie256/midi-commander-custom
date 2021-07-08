@@ -125,11 +125,17 @@ static uint8_t  USBD_MIDI_DataOut (USBD_HandleTypeDef *pdev, uint8_t epnum)
 
 
 void USBD_MIDI_SendPacket (uint8_t* buffer, uint8_t len){
-  if(USB_Tx_State != 1){
+
+	if(pInstance->dev_state != USBD_STATE_CONFIGURED)
+		return;
+
+	while(USB_Tx_State)
+		;
+
     USB_Tx_State = 1;
     while(USBD_LL_Transmit(pInstance, MIDI_IN_EP,buffer,len) != USBD_OK)
     	;
-  }
+
 }
 
 static uint8_t *USBD_MIDI_GetCfgDesc (uint16_t *length){

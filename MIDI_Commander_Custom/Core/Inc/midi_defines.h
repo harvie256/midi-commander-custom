@@ -2,7 +2,7 @@
  * midi_defines.h
  *
  *  Created on: 4 Jul 2021
- *      Author: derry
+ *      Author: D Harvie
  */
 
 #ifndef INC_MIDI_DEFINES_H_
@@ -28,6 +28,12 @@
 #define CIN_PITCHBEND_CHANGE			(0xE)
 #define CIN_SINGLE_BYTE					(0xF)
 
+#define MIDI_PC_BANK_SELECT_MSB	(0x00)
+#define MIDI_PC_BANK_SELECT_LSB (0X20)
+
+#define MIDI_CONTROL_ON		(1)
+#define MIDI_CONTROL_OFF	(0)
+
 // using the private use manufacturer ID
 #define MIDI_MANUF_ID	(0x7D)
 
@@ -39,9 +45,18 @@
 #define SYSEX_CMD_WRITE_EEPROM	(54) // first byte is the page address (16 byte pages), valid range 0-63.  Following 16 bytes are the data to write
 #define SYSEX_RSP_WRITE_EEPROM	(55) // zero length response to confirm write
 
-
 #define SYSEX_START (0xF0)
 #define SYSEX_END	(0xF7)
 
+#define CMD_NO_CMD_NIBBLE	(0x00)
+#define CMD_PC_NIBBLE		(0xC0)
+#define CMD_CC_NIBBLE		(0xB0)
+#define CMD_PB_NIBBLE		(0xE0)
+#define CMD_NOTE_NIBBLE		(0x90)
+#define CMD_START_NIBBLE	(0x10)
+#define CMD_STOP_NIBBLE		(0x20)
+
+#define GLOBAL_SETTINGS_CHANNEL (0)
+#define GLOBAL_SETTINGS_REALTIME_PASS (1)
 
 #endif /* INC_MIDI_DEFINES_H_ */
