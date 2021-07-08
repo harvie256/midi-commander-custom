@@ -40,7 +40,7 @@ extern uint8_t APP_Rx_Buffer   [APP_RX_DATA_SIZE];
 extern uint32_t APP_Rx_ptr_in;
 extern uint32_t APP_Rx_ptr_out;
 extern uint32_t APP_Rx_length;
-extern uint8_t  USB_Tx_State;
+extern volatile uint8_t  USB_Tx_State;
 
 extern USBD_ClassTypeDef  USBD_MIDI;
 #define USBD_MIDI_CLASS    &USBD_MIDI
