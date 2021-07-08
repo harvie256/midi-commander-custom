@@ -32,7 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-uint8_t* pma;
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -101,6 +101,8 @@ void Error_Handler(void);
 #define SW_A_Pin GPIO_PIN_5
 #define SW_A_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
+
+#define FIRMWARE_VERSION	"0.1A"
 
 /* USER CODE END Private defines */
 

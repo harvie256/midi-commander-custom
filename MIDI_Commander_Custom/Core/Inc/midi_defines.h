@@ -44,6 +44,7 @@
 #define SYSEX_RSP_ERASE_EEPROM	(53) // zero length response to confirm success
 #define SYSEX_CMD_WRITE_EEPROM	(54) // first byte is the page address (16 byte pages), valid range 0-63.  Following 16 bytes are the data to write
 #define SYSEX_RSP_WRITE_EEPROM	(55) // zero length response to confirm write
+#define SYSEX_CMD_RESET			(60) // Reset the device
 
 #define SYSEX_START (0xF0)
 #define SYSEX_END	(0xF7)

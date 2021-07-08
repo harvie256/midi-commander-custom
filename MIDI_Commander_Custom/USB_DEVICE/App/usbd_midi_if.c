@@ -74,6 +74,7 @@ void sysex_send_message(uint8_t* buffer, uint8_t length){
 	MIDI_DataTx(sysex_tx_assembly_buffer, assembly_ptr - sysex_tx_assembly_buffer);
 }
 
+
 void sysex_erase_eeprom(uint8_t* data_packet_start){
 	if(data_packet_start[0] != 0x42 || data_packet_start[1] != 0x24){
 		return;
@@ -166,6 +167,9 @@ void process_sysex_message(void){
 	case SYSEX_CMD_WRITE_EEPROM:
 		// TODO: check data length
 		sysex_write_eeprom(&(pSysexHead->start_parameters));
+		break;
+	case SYSEX_CMD_RESET:
+		NVIC_SystemReset();
 		break;
 	default:
 		break;

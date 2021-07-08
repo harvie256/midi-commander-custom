@@ -46,7 +46,7 @@ def cmd_cc(cmd):
         int(cmd['Number_(PC/CC/Note)']) & 0x7F | \
             get_toggle_bit(cmd['Toggle_(CC/PB/Note)']), # command number & toggle
         int(cmd['OnValue_(CC/PB)']) & 0x7F,
-        int(cmd['OffValue_(CC)']) & 0x7F
+        int(cmd['OffValue_(CC)'])
         ]
     return cmd_bytes
 
@@ -63,7 +63,6 @@ def cmd_note(cmd):
     
     
 def cmd_pb(cmd):
-    center_pitch = 0x2000
     # The pitch in the CSV file will be -8192 to 8191, this needs to be centered
     # around 0x2000
     

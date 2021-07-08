@@ -236,6 +236,12 @@ int8_t midiCmd_send_note_command_from_rom(uint8_t *pRom, uint8_t on_off){
 }
 
 int8_t midiCmd_send_cc_command_from_rom(uint8_t *pRom, uint8_t on_off){
+	// Check switch off value is valid, else no off value will be sent
+	if(!on_off){
+		if(pRom[3] > 0x7F)
+			return 0;
+	}
+
 	__disable_irq();
 	int8_t buffer_no = get_next_available_tx_buffer();
 	if(buffer_no < 0){

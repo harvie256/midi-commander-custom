@@ -31,6 +31,7 @@
 #include "eeprom_midi_settings.h"
 #include "midi_cmds.h"
 #include "switch_router.h"
+#include "display.h"
 
 /* USER CODE END Includes */
 
@@ -113,14 +114,18 @@ int main(void)
 
   // Reset the USB interface in case it's still plugged in.
   HAL_GPIO_WritePin(USB_ID_GPIO_Port, USB_ID_Pin, GPIO_PIN_RESET);
+
+  display_init();
+  eeprom_load_settings();
+  display_setConfigName();
+  sw_led_init();
+
   HAL_Delay(1000);
   HAL_GPIO_WritePin(USB_ID_GPIO_Port, USB_ID_Pin, GPIO_PIN_SET);
 
-  eeprom_load_settings();
-  sw_led_init();
-
   HAL_Delay(200);
   f_sys_config_complete = 1; // Don't scan switch changes until everything is init'd
+  display_setBankName(0);
 
   /* USER CODE END 2 */
 

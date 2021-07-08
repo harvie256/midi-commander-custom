@@ -8,6 +8,7 @@
 #include "midi_defines.h"
 #include "midi_cmds.h"
 #include "eeprom_midi_settings.h"
+#include "display.h"
 
 /*
  * Creating some constant arrays for the switches that can be scanned and handled
@@ -139,6 +140,10 @@ void sw_led_init(void){
 	for(int i = 0; i<8; i++){
 		HAL_GPIO_WritePin(a_sw_obj[i].led_gpio_port, a_sw_obj[i].led_gpio_pin, GPIO_PIN_SET);
 	}
+	HAL_GPIO_WritePin(SW_5_GPIO_Port, SW_5_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(SW_E_GPIO_Port, SW_E_Pin, GPIO_PIN_SET);
+
+
 }
 
 
@@ -268,8 +273,19 @@ void setLed(uint8_t sw_no, uint8_t state){
 
 }
 
+void updateLedsOnBankChange(void){
+	for(int i=0; i<8; i++){
+		if(a_sw_obj[i].led_cmd_toggle & (1<<switch_current_page)){
+			setLed(i,get_sw_toggle_stage(&a_sw_obj[i]));
+		} else {
+			setLed(i,RESET);
+		}
+	}
+}
+
 void handleSwitches(void){
 
+	// The Command switches
 	for(int i=0; i<8; i++){
 		if(*a_sw_obj[i].pSwChangeState & a_sw_obj[i].sw_gpio_pin){
 				*a_sw_obj[i].pSwChangeState &= ~a_sw_obj[i].sw_gpio_pin;
@@ -286,7 +302,8 @@ void handleSwitches(void){
 					}
 
 					for(int j=0; j<3; j++){
-						handleCmdSwDown(pSwitchCmds + (MIDI_ROM_KEY_STRIDE * i) + (MIDI_ROM_CMD_SIZE * j), get_sw_toggle_stage(&a_sw_obj[i]));
+						handleCmdSwDown(pSwitchCmds + (MIDI_ROM_KEY_STRIDE * (i + switch_current_page*8)) + (MIDI_ROM_CMD_SIZE * j),
+								get_sw_toggle_stage(&a_sw_obj[i]));
 					}
 				}else {
 					// Switch up
@@ -296,7 +313,8 @@ void handleSwitches(void){
 					}
 
 					for(int j=0; j<3; j++){
-						handleCmdSwUp(pSwitchCmds + (MIDI_ROM_KEY_STRIDE * i) + (MIDI_ROM_CMD_SIZE * j), get_sw_toggle_stage(&a_sw_obj[i]));
+						handleCmdSwUp(pSwitchCmds + (MIDI_ROM_KEY_STRIDE * (i + switch_current_page*8)) + (MIDI_ROM_CMD_SIZE * j),
+								get_sw_toggle_stage(&a_sw_obj[i]));
 					}
 
 				}
@@ -305,5 +323,40 @@ void handleSwitches(void){
 	}
 
 	handleDelayedCmds();
+
+	// The bank change switches
+	if(port_A_switches_changed & SW_E_Pin){
+		port_A_switches_changed &= ~SW_E_Pin;
+
+		if(!HAL_GPIO_ReadPin(SW_E_GPIO_Port, SW_E_Pin)){
+			// Bank Down
+			HAL_GPIO_WritePin(LED_E_GPIO_Port, LED_E_Pin, RESET);
+
+			if(switch_current_page > 0){
+				switch_current_page--;
+				updateLedsOnBankChange();
+				display_setBankName(switch_current_page);
+			}
+		} else {
+			HAL_GPIO_WritePin(LED_E_GPIO_Port, LED_E_Pin, SET);
+		}
+	}
+
+	if(port_B_switches_changed & SW_5_Pin){
+		port_B_switches_changed &= ~SW_5_Pin;
+
+		if(!HAL_GPIO_ReadPin(SW_5_GPIO_Port, SW_5_Pin)){
+			// Bank Down
+			HAL_GPIO_WritePin(LED_5_GPIO_Port, LED_5_Pin, RESET);
+
+			if(switch_current_page < 7){
+				switch_current_page++;
+				updateLedsOnBankChange();
+				display_setBankName(switch_current_page);
+			}
+		} else {
+			HAL_GPIO_WritePin(LED_5_GPIO_Port, LED_5_Pin, SET);
+		}
+	}
 }
 

@@ -1,10 +1,10 @@
 import io
 import pandas as pd
-from datetime import datetime
 import cmdBinaryPacker as cbp
 import settingsBinaryPacker as sbp
+import sys
 
-inputFile = r"C:\Users\derry\Downloads\MeloConfig - Sheet1.csv"
+inputFile = sys.argv[1]
 
 with open(inputFile, 'r') as f:
     raw_content = f.readlines()
@@ -56,3 +56,4 @@ with open('config_image.bin', 'wb') as f:
     f.write(memory_bytes)
 
 # File should be 896 bytes long
+    
