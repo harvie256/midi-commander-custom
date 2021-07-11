@@ -13,7 +13,7 @@ import time
 MIDI_MANUF_ID = 0x7D
 
 WRITE_EEPROM = 54
-SYSEX_CMD_RESET	= (60)
+SYSEX_CMD_RESET	= 60
 
 
 File_To_Write = r"D:\midi-commander-custom\python\config_image.bin"

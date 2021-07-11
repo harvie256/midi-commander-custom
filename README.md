@@ -9,12 +9,12 @@ There's no intention of this replacing the default firmware functions. I'm creat
 - Supports Program Change (aka Patch Change), Controller Change, Note, Pitch Bend and Start/Stop messages for any of the buttons.
 - The Channel for each message is configured on each individual command.  So it can address seperate pieces of hardware in a midi chain.
 - 8 banks of 8 buttons.  Each bank can display message strings for identification.
-- 0 to 3 completely independant commands on each switch/bank position.  Enables configuring different devices, or a series of actions of each button push.
+- 0 to 3 independant chained commands on each switch/bank position.  Enables configuring different devices, or a series of actions of each button push.
 - CC, Note and Pitch Bend support momenary, toggle, or an on-duration of up to 2.5 sec in 10ms increments. CC can also send just the start message.
 - Program Change messages can include the Bank Select messages prior to the PC message, either just the Lease Signficant Byte or both the LSB & MSB.
 - Pass through of Sync/Start/Stop messages from USB to the Serial MIDI connector.
 
-- Can be loaded through the normal DFU update process.
+- Firmware can be loaded through the normal DFU update process.
 - Uses a section of the EEPROM that the standard MeloAudio firmware doesn't (at least as I write this.)  So it's possible to reload firmwares without effecting settings.
 - Provides SYSEX tools for downloading and uploading both the configuration section for this firmware, and to completely backup and restore the eeprom.
 

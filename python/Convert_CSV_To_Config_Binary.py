@@ -1,7 +1,7 @@
 import io
 import pandas as pd
-import cmdBinaryPacker as cbp
-import settingsBinaryPacker as sbp
+import lib.cmdBinaryPacker as cbp
+import lib.settingsBinaryPacker as sbp
 import sys
 
 inputFile = sys.argv[1]

@@ -140,8 +140,8 @@ void sw_led_init(void){
 	for(int i = 0; i<8; i++){
 		HAL_GPIO_WritePin(a_sw_obj[i].led_gpio_port, a_sw_obj[i].led_gpio_pin, GPIO_PIN_SET);
 	}
-	HAL_GPIO_WritePin(SW_5_GPIO_Port, SW_5_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(SW_E_GPIO_Port, SW_E_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LED_5_GPIO_Port, LED_5_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LED_E_GPIO_Port, LED_E_Pin, GPIO_PIN_SET);
 
 
 }
@@ -223,8 +223,10 @@ void handleCmdSwDown(uint8_t *pRom, uint8_t toggleState){
 		}
 		break;
 	case CMD_START_NIBBLE:
+		midiCmd_send_start_command();
 		break;
 	case CMD_STOP_NIBBLE:
+		midiCmd_send_stop_command();
 		break;
 	default:
 		break;
@@ -257,10 +259,8 @@ void handleCmdSwUp(uint8_t *pRom, uint8_t toggleState){
 		}
 		break;
 	case CMD_START_NIBBLE:
-		midiCmd_send_start_command();
 		break;
 	case CMD_STOP_NIBBLE:
-		midiCmd_send_stop_command();
 		break;
 	default:
 		break;
