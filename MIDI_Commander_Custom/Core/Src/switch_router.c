@@ -7,7 +7,7 @@
 #include "main.h"
 #include "midi_defines.h"
 #include "midi_cmds.h"
-#include "eeprom_midi_settings.h"
+#include "flash_midi_settings.h"
 #include "display.h"
 
 /*

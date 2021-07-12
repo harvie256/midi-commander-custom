@@ -115,8 +115,14 @@ int main(void)
   // Reset the USB interface in case it's still plugged in.
   HAL_GPIO_WritePin(USB_ID_GPIO_Port, USB_ID_Pin, GPIO_PIN_RESET);
 
+  // Check we've got a 512kB device, in case Melo switch to a smaller device at some point
+  uint16_t flash_size = (*(uint16_t*)FLASHSIZE_BASE);
+  if(flash_size < 512){
+	  Error_Handler();
+  }
+
+
   display_init();
-  eeprom_load_settings();
   display_setConfigName();
   sw_led_init();
 

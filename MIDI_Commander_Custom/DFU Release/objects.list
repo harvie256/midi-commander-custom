@@ -1,5 +1,5 @@
 "Core/Src/display.o"
-"Core/Src/eeprom_midi_settings.o"
+"Core/Src/flash_midi_settings.o"
 "Core/Src/main.o"
 "Core/Src/midi_cmds.o"
 "Core/Src/stm32f1xx_hal_msp.o"

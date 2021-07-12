@@ -6,7 +6,7 @@
 #include "usbd_midi_if.h"
 #include "stm32f1xx_hal.h"
 #include "midi_defines.h"
-#include "eeprom_midi_settings.h"
+#include "flash_midi_settings.h"
 #include "midi_cmds.h"
 #include <string.h>
 
@@ -75,71 +75,37 @@ void sysex_send_message(uint8_t* buffer, uint8_t length){
 }
 
 
-void sysex_erase_eeprom(uint8_t* data_packet_start){
+void sysex_erase_settings(uint8_t* data_packet_start){
 	if(data_packet_start[0] != 0x42 || data_packet_start[1] != 0x24){
 		return;
 	}
 
-	uint8_t eraseData[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-	uint32_t bytes = 0;
-	while ( bytes < 1024)
-	{
-		HAL_I2C_Mem_Write(&hi2c1, 0xA0 | ((bytes & 0x0300) >> 7), (bytes & 0xff), I2C_MEMADD_SIZE_8BIT, eraseData, sizeof(eraseData), 100);
-		HAL_Delay(5);
-		bytes += sizeof(eraseData);
-	}
+	flash_settings_erase();
 
 	midi_msg_tx_buffer[0] = SYSEX_START;
 	midi_msg_tx_buffer[1] = MIDI_MANUF_ID;
-	midi_msg_tx_buffer[2] = SYSEX_RSP_ERASE_EEPROM;
+	midi_msg_tx_buffer[2] = SYSEX_RSP_ERASE_FLASH;
 	midi_msg_tx_buffer[3] = SYSEX_END;
 	sysex_send_message(midi_msg_tx_buffer, 4);
-
 }
 
-void sysex_write_eeprom(uint8_t* data_packet_start){
-	uint16_t ee_byte_address = data_packet_start[0] * 16;
+void sysex_write_flash(uint8_t* data_packet_start){
+	uint32_t flash_byte_offset = ( (data_packet_start[0] << 7) | data_packet_start[1]) * 16;
 
 	uint8_t reassembled_array[16];
-	data_packet_start++;
+	data_packet_start += 2;
 	for (int i=0; i<16; i++){
 		reassembled_array[i] = data_packet_start[2*i] << 4 | data_packet_start[2*i + 1];
 	}
 
-	HAL_I2C_Mem_Write(&hi2c1, 0xA0 | ((ee_byte_address & 0x0300) >> 7), (ee_byte_address & 0xff), I2C_MEMADD_SIZE_8BIT, reassembled_array, 16, 100);
+	flash_settings_write(reassembled_array, flash_byte_offset);
 
 	midi_msg_tx_buffer[0] = SYSEX_START;
 	midi_msg_tx_buffer[1] = MIDI_MANUF_ID;
-	midi_msg_tx_buffer[2] = SYSEX_RSP_WRITE_EEPROM;
+	midi_msg_tx_buffer[2] = SYSEX_RSP_WRITE_FLASH;
 	midi_msg_tx_buffer[3] = SYSEX_END;
 	sysex_send_message(midi_msg_tx_buffer, 4);
 
-}
-
-void sysex_dump_eeprom_page(uint8_t page_number){
-	uint8_t eeprom_buffer[16];
-
-	midi_msg_tx_buffer[0] = SYSEX_START;
-	midi_msg_tx_buffer[1] = MIDI_MANUF_ID;
-	midi_msg_tx_buffer[2] = SYSEX_RSP_DUMP_EEPROM;
-	midi_msg_tx_buffer[3] = page_number;
-
-	uint16_t ee_byte_address = page_number * 16;
-
-	HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c1, 0xA0 | ((ee_byte_address & 0x0300) >> 7), (ee_byte_address & 0xff), I2C_MEMADD_SIZE_8BIT, eeprom_buffer, 16, 100);
-
-	if(status == HAL_OK){
-		// Because we cannot use the high bit in each byte for a midi packet, we need to break it down.
-		// Easiest (and perhaps lasy way) is to break each byte into two nibbles.
-
-		for(int i=0; i<16; i++){
-			midi_msg_tx_buffer[4+(i*2)] = eeprom_buffer[i] >> 4;
-			midi_msg_tx_buffer[4+(i*2)+1] = eeprom_buffer[i] & 0x0F;
-		}
-
-		midi_msg_tx_buffer[4+32] = SYSEX_END;
-		sysex_send_message(midi_msg_tx_buffer, 37);
-	}
 }
 
 void process_sysex_message(void){
@@ -158,15 +124,12 @@ void process_sysex_message(void){
 	}
 
 	switch(pSysexHead->msg_cmd){
-	case SYSEX_CMD_DUMP_EEPROM:
-		sysex_dump_eeprom_page(pSysexHead->start_parameters);
+	case SYSEX_CMD_ERASE_FLASH:
+		sysex_erase_settings(&(pSysexHead->start_parameters));
 		break;
-	case SYSEX_CMD_ERASE_EEPROM:
-		sysex_erase_eeprom(&(pSysexHead->start_parameters));
-		break;
-	case SYSEX_CMD_WRITE_EEPROM:
+	case SYSEX_CMD_WRITE_FLASH:
 		// TODO: check data length
-		sysex_write_eeprom(&(pSysexHead->start_parameters));
+		sysex_write_flash(&(pSysexHead->start_parameters));
 		break;
 	case SYSEX_CMD_RESET:
 		NVIC_SystemReset();
