@@ -5,10 +5,10 @@
  *      Author: D Harvie
  */
 #include "main.h"
+#include "flash_midi_settings.h"
 #include <string.h>
 #include <stdio.h>
 #include "ssd1306.h"
-#include "eeprom_midi_settings.h"
 
 
 void display_init(void){

@@ -333,8 +333,6 @@
                         					
                     </folderInfo>
                     					
-                    <fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.566328293.793866958.121285940" name="eeprom_midi_settings.h" rcbsApplicability="disable" resourcePath="Core/Inc/eeprom_midi_settings.h" toolsToInvoke=""/>
-                    					
                     <sourceEntries>
                         						
                         <entry excluding="Inc/eeprom_midi_settings.h|Src/eeprom_midi_settings.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>

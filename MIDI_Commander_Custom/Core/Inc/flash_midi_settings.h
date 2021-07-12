@@ -2,7 +2,7 @@
  * flash_midi_settings.h
  *
  *  Created on: 12 Jul 2021
- *      Author: derry
+ *      Author: D Harvie
  */
 
 #ifndef INC_FLASH_MIDI_SETTINGS_H_

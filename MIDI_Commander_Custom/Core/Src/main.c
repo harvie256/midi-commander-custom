@@ -28,7 +28,6 @@
 #include <stdbool.h>
 #include "usbd_midi_if.h"
 #include "midi_defines.h"
-#include "eeprom_midi_settings.h"
 #include "midi_cmds.h"
 #include "switch_router.h"
 #include "display.h"
