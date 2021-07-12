@@ -15,7 +15,7 @@ There's no intention of this replacing the default firmware functions. I'm creat
 - Pass through of Sync/Start/Stop messages from USB to the Serial MIDI connector.
 
 - Firmware can be loaded through the normal DFU update process.
-- Uses a section of the EEPROM that the standard MeloAudio firmware doesn't (at least as I write this.)  So it's possible to reload firmwares without effecting settings.
+- Configuration has been moved to the FLASH memory, so this will not affect the standard Melo firmware configuration that is stored in an external EEPROM.
 - Provides SYSEX tools for downloading and uploading both the configuration section for this firmware, and to completely backup and restore the eeprom.
 
 # Still to come
@@ -31,5 +31,4 @@ The basic configuration idea, is you use a spreadsheet template to create a conf
 This has some conditional formating and layout that makes choosing commands quite straight forward.
 https://docs.google.com/spreadsheets/d/10smgMXW7wyQpB8cjfMVDMhDkW0gWgf0O7VTku3-jU90/edit#gid=0
 
-The downloaded (or "Save As" in excel et al) CSV file is then passed to Convert_CSV_To_Config_Binary.py, which converts the CSV file into a binary called config_image.bin.
-A second tool, Write_Settings_To_Eeprom.py, will load this binary file, write the eeprom, then reset the MIDI Commander to load the new settings.
+The downloaded (or "Save As" in excel et al) CSV file is then passed to CSV_to_Flash.py, which will convert the CSV file to a binary format and download to the USB connect midicommander.
