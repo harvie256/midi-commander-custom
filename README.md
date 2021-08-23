@@ -3,6 +3,10 @@ Custom Firmware for the MeloAudio Midi Commander
 
 There's no intention of this replacing the default firmware functions. I'm creating this purely for custom requirements that the original firmware will never fulfill.
 
+# Build status
+
+## This is currently not ready for general use.  This is still in a development state and no binary is provided for upload.
+
 # Current features list
 - Completely open source, so feel free to contribute (even just bug reports! or better still user guides)
 - "Spreadsheet" based configuration, no scrolling through menus on that tiny screen with huge buttons. Easy Copy/Paste, Fill, etc. Easy sharing.
