@@ -18,6 +18,9 @@ DFU_FILE_MGR_PATH = BASE_PATH.joinpath(r"DFU\MidiCommander_DFU_APP\DfuFileMgr.ex
 HEX_FILE_PATH = BASE_PATH.joinpath(r"MIDI_Commander_Custom\DFU Release\MIDI_Commander_Custom.hex").__str__()
 DFU_OUTPUT_PATH = BASE_PATH.joinpath(r'DFU\DFU_OUT\generated-{}.dfu'.format(time.strftime("%Y%m%d-%H%M%S"))).__str__()
 
+# Create the output folder if it doesn't exist
+BASE_PATH.joinpath(r'DFU\DFU_OUT').mkdir(parents=True, exist_ok=True)
+
 # Increase key stroke speed, which seems to work fine for this app.
 Timings.fast()
 
