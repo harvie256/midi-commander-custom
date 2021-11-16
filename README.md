@@ -3,6 +3,10 @@ Custom Firmware for the MeloAudio Midi Commander
 
 There's no intention of this replacing the default firmware functions. I'm creating this purely for custom requirements that the original firmware will never fulfill.
 
+# Build status
+
+## This is currently not ready for general use.  This is still in a development state and no binary is provided for upload.
+
 # Current features list
 - Completely open source, so feel free to contribute (even just bug reports! or better still user guides)
 - "Spreadsheet" based configuration, no scrolling through menus on that tiny screen with huge buttons. Easy Copy/Paste, Fill, etc. Easy sharing.
@@ -33,7 +37,13 @@ https://docs.google.com/spreadsheets/d/10smgMXW7wyQpB8cjfMVDMhDkW0gWgf0O7VTku3-j
 
 The downloaded (or "Save As" in excel et al) CSV file is then passed to CSV_to_Flash.py, which will convert the CSV file to a binary format and download to the USB connect midicommander.
 
+Here's an overview, a brief talk through of some of the current features implemented in the custom firmware.
+
+https://www.youtube.com/watch?v=GgkyX2U_hiY
+
+
+
 # Basic instructions for setting up development environment
 Other than the simple python scripts, it's all just STM32CubIDE. Install that, import the project into your workspace (it's just shrink wrapped eclipse) and your done.
 
-There's two Build settings, one for the DFU (with offset linker script and vector table) and the other for using with a ST-Link debugger. To build a DFU file for upload you'll need to build the binary in the IDE, then use the DFU packing tool that comes with the DFU uploader (can't remember their exact names off the top of my head.) Using the ELF file instead of the .bin saves you having to input the flash offset.
+There's two Build settings, one for the DFU (with offset linker script and vector table) and the other for using with a ST-Link debugger. To build a DFU file for upload you'll need to build the binary in the IDE, then use the DFU packing tool that comes with the DFU uploader (can't remember their exact names off the top of my head.) Using the Intel HEX format file instead of the .bin saves you having to input the flash offset.
