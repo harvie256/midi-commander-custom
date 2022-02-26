@@ -8,6 +8,7 @@
 #include "midi_defines.h"
 #include "flash_midi_settings.h"
 #include "midi_cmds.h"
+#include "switch_router.h"
 #include <string.h>
 
 extern I2C_HandleTypeDef hi2c1;
@@ -130,6 +131,11 @@ void process_sysex_message(void){
 	case SYSEX_CMD_WRITE_FLASH:
 		// TODO: check data length
 		sysex_write_flash(&(pSysexHead->start_parameters));
+		/*
+		 * Init LEDs after receiving the new config to reset LEDs to the off state and
+		 * re-read from the new config which LEDs should have a toggle behavior.
+		 */
+		sw_led_init();
 		break;
 	case SYSEX_CMD_RESET:
 		NVIC_SystemReset();
