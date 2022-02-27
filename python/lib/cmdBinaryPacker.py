@@ -1,3 +1,4 @@
+MIDI_NUM_COMMANDS_PER_SWITCH = 3
 
 CMD_NO_CMD_NIBBLE = 0x00
 CMD_PC_NIBBLE = 0xC0
@@ -107,24 +108,13 @@ def remove_prefix(text, prefix):
     return text
 
 def pack_row(row):
-    
-    cmd_A = row.loc[row.index.str.startswith('A_')]
-    cmd_A.index = cmd_A.index.str.replace('A_','')
-    func_A = cmd_route_table.get(cmd_A['CommandType'], cmd_none)
-    
-    cmd_B = row.loc[row.index.str.startswith('B_')]
-    cmd_B.index = cmd_B.index.str.replace('B_','')
-    func_B = cmd_route_table.get(cmd_B['CommandType'], cmd_none)
-    
-    cmd_C = row.loc[row.index.str.startswith('C_')]
-    cmd_C.index = cmd_C.index.str.replace('C_','')
-    func_C = cmd_route_table.get(cmd_C['CommandType'], cmd_none)
-    
-    row_byte_list = func_A(cmd_A)
-    row_byte_list += func_B(cmd_B)
-    row_byte_list += func_C(cmd_C)
+    row_byte_list = []
+    for i in range(0, MIDI_NUM_COMMANDS_PER_SWITCH):
+        cmd_prefix = f"{chr(ord('A') + i)}_"
+        cmd = row.loc[row.index.str.startswith(cmd_prefix)]
+        cmd.index = cmd.index.str.replace(cmd_prefix, '')
+        func = cmd_route_table.get(cmd['CommandType'], cmd_none)
+        cmd_byte_list = func(cmd)
+        row_byte_list += cmd_byte_list
 
     return row_byte_list
-
-
-    
