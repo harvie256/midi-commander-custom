@@ -1,4 +1,4 @@
-MIDI_NUM_COMMANDS_PER_SWITCH = 3
+MIDI_NUM_COMMANDS_PER_SWITCH = 10
 
 CMD_NO_CMD_NIBBLE = 0x00
 CMD_PC_NIBBLE = 0xC0
@@ -30,14 +30,14 @@ def cmd_pc(cmd):
         bank_select_high = (int(cmd['BankSelect_(PC)']) >> 7) & 0x7F
     else:
         bank_select_high = 0x80
-    
+
     cmd_bytes = [
         CMD_PC_NIBBLE | int(cmd['Channel_(PC/CC/Note/PB)'] - 1), # Command and channel
         int(cmd['Number_(PC/CC/Note)']) & 0x7F, # Patch number
         bank_select_high,
         bank_select_low
         ]
-    
+
     return cmd_bytes
 
 
@@ -61,20 +61,20 @@ def cmd_note(cmd):
         int(cmd['Duration_(Note/PB)']) & 0x7F
         ]
     return cmd_bytes
-    
-    
+
+
 def cmd_pb(cmd):
     # The pitch in the CSV file will be -8192 to 8191, this needs to be centered
     # around 0x2000
-    
+
     if -8192 > cmd['OnValue_(CC/PB)'] > 8191:
         raise ValueError('PB outside of range: ', cmd['OnValue_(CC/PB)'])
-    
+
     pitch = int(cmd['OnValue_(CC/PB)'] + 0x2000)
-    
+
     pitch_LSB = pitch & 0x7F
-    pitch_MSB = (pitch >> 7) & 0x7F 
-    
+    pitch_MSB = (pitch >> 7) & 0x7F
+
     cmd_bytes = [
         CMD_PB_NIBBLE | int(cmd['Channel_(PC/CC/Note/PB)'] - 1), # Command and channel
         pitch_LSB | get_toggle_bit(cmd['Toggle_(CC/PB/Note)']), # high byte of value & toggle
@@ -87,11 +87,14 @@ def cmd_pb(cmd):
 def cmd_start(cmd):
     return [CMD_START_NIBBLE, 0, 0, 0]
 
+
 def cmd_stop(cmd):
     return [CMD_STOP_NIBBLE, 0, 0, 0]
 
+
 def cmd_none(cmd):
     return [0,0,0,0]
+
 
 cmd_route_table = {
     'PC': cmd_pc,
@@ -102,10 +105,12 @@ cmd_route_table = {
     'Stop':cmd_stop
     }
 
+
 def remove_prefix(text, prefix):
     if text.startswith(prefix):
         return text[len(prefix):]
     return text
+
 
 def pack_row(row):
     row_byte_list = []

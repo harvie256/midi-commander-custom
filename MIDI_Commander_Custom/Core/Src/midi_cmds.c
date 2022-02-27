@@ -7,6 +7,7 @@
 #include "main.h"
 #include "midi_defines.h"
 #include "usbd_midi_if.h"
+#include "ssd1306.h"
 
 extern UART_HandleTypeDef huart2;
 
@@ -252,10 +253,13 @@ int8_t midiCmd_send_cc_command_from_rom(uint8_t *pRom, uint8_t on_off){
 	uint8_t *serialBuf = &(midi_uart_out_buffer[buffer_no][0]);
 	uint8_t *usbBuf = midi_usb_assembly_buffer;
 
+	uint8_t cc_number = pRom[1] & 0x7F; // CC Number
+	uint8_t cc_value = (on_off) ?  pRom[2] & 0x7F : pRom[3] & 0x7F; // Value
+
 	*(usbBuf++) = CIN_CONTROL_CHANGE;
 	*(usbBuf++) = 0xB0 | (pRom[0] & 0xF); // CC and Channel
-	*(usbBuf++) = pRom[1] & 0x7F; // CC Number
-	*(usbBuf++) = (on_off) ?  pRom[2] & 0x7F : pRom[3] & 0x7F; // Value
+	*(usbBuf++) = cc_number;
+	*(usbBuf++) = cc_value;
 
 	memcpy(serialBuf, (usbBuf-3), 3);
 	serialBuf += 3;
@@ -268,7 +272,19 @@ int8_t midiCmd_send_cc_command_from_rom(uint8_t *pRom, uint8_t on_off){
 	MIDI_DataTx(midi_usb_assembly_buffer, usb_bytes_to_tx);
 
 	midi_serial_transmit();
-	return 0;
+
+	/*
+	 * Displaying messages on screen likely involves a delay which can be
+	 * detrimental on the timing of MIDI messages. So keep this commented and
+	 * only use for debugging.
+	 */
+//	ssd1306_SetCursor(2, 10);
+//	char msg[25];
+//	sprintf(msg, "CC %d = %d", cc_number, cc_value);
+//	ssd1306_WriteString(msg, Font_6x8, White);
+//	ssd1306_UpdateScreen();
+
+ 	return 0;
 }
 
 
