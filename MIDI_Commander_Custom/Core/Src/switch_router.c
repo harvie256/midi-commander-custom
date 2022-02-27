@@ -122,7 +122,7 @@ void sw_led_init(void){
 			// Clear the toggle bit
 			a_sw_obj[sw].led_cmd_toggle &= ~(1<<page);
 
-			for(int cmd=0; cmd<3; cmd++){
+			for(int cmd=0; cmd<MIDI_NUM_COMMANDS_PER_SWITCH; cmd++){
 				uint8_t *pCmd = getRomPointer(page, sw, cmd);
 				if(midiCmd_get_cmd_toggle(pCmd)){
 					a_sw_obj[sw].led_cmd_toggle |= (1<<page);
@@ -301,7 +301,7 @@ void handleSwitches(void){
 						setLed(i,SET);
 					}
 
-					for(int j=0; j<3; j++){
+					for(int j=0; j<MIDI_NUM_COMMANDS_PER_SWITCH; j++){
 						handleCmdSwDown(pSwitchCmds + (MIDI_ROM_KEY_STRIDE * (i + switch_current_page*8)) + (MIDI_ROM_CMD_SIZE * j),
 								get_sw_toggle_stage(&a_sw_obj[i]));
 					}
@@ -312,7 +312,7 @@ void handleSwitches(void){
 						setLed(i, RESET);
 					}
 
-					for(int j=0; j<3; j++){
+					for(int j=0; j<MIDI_NUM_COMMANDS_PER_SWITCH; j++){
 						handleCmdSwUp(pSwitchCmds + (MIDI_ROM_KEY_STRIDE * (i + switch_current_page*8)) + (MIDI_ROM_CMD_SIZE * j),
 								get_sw_toggle_stage(&a_sw_obj[i]));
 					}
