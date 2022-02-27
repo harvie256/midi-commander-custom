@@ -8,6 +8,10 @@
 #ifndef INC_MIDI_CMDS_H_
 #define INC_MIDI_CMDS_H_
 
+#include <stdint.h>
+
+#define ERROR_BUFFERS_FULL (-1)
+
 //void sendMidiCC(uint8_t channel, uint8_t controller_number, uint8_t controller_value);
 
 int8_t midiCmd_send_pc_command_from_rom(uint8_t *pRom);
