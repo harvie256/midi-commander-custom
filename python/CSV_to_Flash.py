@@ -109,3 +109,8 @@ for x in range(0, no_chunks):
 
 
 print('Finshed, reseting device...')
+outmsg = mido.Message('sysex', data=[MIDI_MANUF_ID, SYSEX_CMD_RESET])
+outport.send(outmsg)
+
+inport.close()
+outport.close()
