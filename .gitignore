@@ -39,3 +39,6 @@ Mkfile.old
 dkms.conf
 
 .metadata
+
+# macOS Finder metadata
+.DS_Store

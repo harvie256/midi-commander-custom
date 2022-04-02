@@ -105,24 +105,30 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+
   MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_I2C1_Init();
+
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
   // Reset the USB interface in case it's still plugged in.
   HAL_GPIO_WritePin(USB_ID_GPIO_Port, USB_ID_Pin, GPIO_PIN_RESET);
 
-  // Check we've got a 512kB device, in case Melo switch to a smaller device at some point
+  display_init();
+
+  // Check we've got a 256kB device, in case Melo switch to a smaller device at some point
   uint16_t flash_size = (*(uint16_t*)FLASHSIZE_BASE);
-  if(flash_size < 512){
-	  Error_Handler();
+  uint16_t min_size = 256;
+  if(flash_size < min_size) {
+	  char msg[25];
+	  sprintf(msg, "Mem %3dkb < %3dkb", flash_size, min_size);
+	  Error(msg);
   }
 
-
-  display_init();
   display_setConfigName();
+
   sw_led_init();
 
   HAL_Delay(1000);
@@ -362,6 +368,24 @@ void Error_Handler(void)
   {
   }
   /* USER CODE END Error_Handler_Debug */
+}
+
+/*
+ * @brief This function can be called to display an error message on the screen,
+ * if the display is on, before calling Error_Handler() to stop all operations.
+ */
+void Error(char *msg) {
+	if (ssd1306_GetDisplayOn() == 0) {
+		/* Display is on */
+		ssd1306_Fill(Black);
+		ssd1306_SetCursor(2, 0);
+		ssd1306_WriteString("Error:", Font_6x8, White);
+		ssd1306_SetCursor(2, 9);
+		ssd1306_WriteString(msg, Font_6x8, White);
+		ssd1306_UpdateScreen();
+	}
+
+	Error_Handler();
 }
 
 #ifdef  USE_FULL_ASSERT

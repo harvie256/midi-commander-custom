@@ -6,12 +6,20 @@ import lib.settingsBinaryPacker as sbp
 import sys
 import mido
 import time
+from math import ceil
 
 MIDI_MANUF_ID = 0x7D
 
 ERASE_FLASH = 52
 WRITE_FLASH = 54
-SYSEX_CMD_RESET	= 60
+SYSEX_CMD_RESET = 60
+
+# Flash pages are 1kByte
+FLASH_PAGE_SIZE = 1024
+
+# This needs to be in sync with flash_midi_settings.c where a number of flash
+# pages to manage is hard-coded
+ALLOWED_NUM_FLASH_PAGES = 3
 
 midi_inputs = [x for x in mido.get_input_names() if 'STM' in x]
 midi_outputs = [x for x in mido.get_output_names() if 'STM' in x]
@@ -36,7 +44,7 @@ def remove_comments(content):
         if "#" not in l:
             no_comments.append(l)
     return no_comments
-        
+
 no_comments = remove_comments(raw_content)
 
 # Split into individual table sections
@@ -57,7 +65,7 @@ for i,tline in enumerate(title_lines):
     df = pd.read_csv(io.StringIO('\n'.join(frame_lines)), delimiter=',').dropna(how='all')
     df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1, inplace=True)
     df_dic[tline[0].strip()] = df
-    
+
 # Setup the columns in the Button_Settings table
 df_dic['Button_Settings'].set_index(['Bank_Number','Button_Identifier'], inplace=True)
 df_dic['Global_Settings'].set_index(['Label'], inplace=True)
@@ -72,11 +80,25 @@ for index, row in df_dic['Button_Settings'].iterrows():
 
 flash_contents = bytes(memory_bytes_list)
 
+content_size = len(flash_contents)
+print(f"Flash content is {content_size} bytes = {content_size / 1024} kB")
+
+actual_num_flash_pages = ceil(content_size / FLASH_PAGE_SIZE)
+if actual_num_flash_pages > ALLOWED_NUM_FLASH_PAGES:
+    print(
+        f"WARNING: Your configuration requires {actual_num_flash_pages} "
+        f"flash pages which is more than the {ALLOWED_NUM_FLASH_PAGES} pages "
+        "allowed")
+
+ans = input("Continue? (y/N) ").lower().strip()
+
+if ans != "y":
+    sys.exit(1)
+
 # File is now converted to a byte array, this will be loaded to the flash.
 
 inport = mido.open_input(midi_inputs[0])
 outport = mido.open_output(midi_outputs[0])
-
 
 # Erase Flash settings pages
 print('Erasing Flash Settings')
@@ -92,13 +114,12 @@ print('Erase Complete')
 no_chunks = int(len(flash_contents)/16)
 for x in range(0, no_chunks):
     print('Writing Flash Chunk: ', x+1, '/', no_chunks)
-    
+
     flash_chunk_low_byte = x & 0x7F
     flash_chunk_high_byte = (x >> 7) & 0x7F
-    
+
     outmsg = mido.Message('sysex', data=[MIDI_MANUF_ID, WRITE_FLASH, flash_chunk_high_byte, flash_chunk_low_byte])
-    
-    
+
     for i in range(0, 16):
         outmsg.data += [flash_contents[x*16 + i] >> 4]
         outmsg.data += [flash_contents[x*16 + i] & 0xF]
@@ -109,3 +130,8 @@ for x in range(0, no_chunks):
 
 
 print('Finshed, reseting device...')
+outmsg = mido.Message('sysex', data=[MIDI_MANUF_ID, SYSEX_CMD_RESET])
+outport.send(outmsg)
+
+inport.close()
+outport.close()

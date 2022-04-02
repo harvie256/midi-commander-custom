@@ -12,7 +12,7 @@
 #define FLASH_SETTINGS_OFFSET	(1024*128)
 #define FLASH_SETTINGS_START	(FLASH_BASE + FLASH_SETTINGS_OFFSET)
 
-#define FLASH_SETTINGS_NO_PAGES	(1)
+#define FLASH_SETTINGS_NO_PAGES	(3)
 
 uint8_t *pGlobalSettings = (uint8_t*)FLASH_SETTINGS_START;
 uint8_t *pBankStrings = (uint8_t*)FLASH_SETTINGS_START+32;
@@ -40,7 +40,7 @@ void flash_settings_erase(void){
 
 	if(status != HAL_OK){
 		// TODO: Display a message of the page that's in error
-		Error_Handler();
+		Error("Flash erase error");
 	}
 
 }
@@ -56,8 +56,7 @@ void flash_settings_write(uint8_t* data, uint32_t offset){
 		uint16_t write_data = data[2*i] + (data[2*i+1] << 8);
 		HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, flash_address + 2*i, write_data);
 		if(status != HAL_OK){
-			// TODO: Display flash write error
-			Error_Handler();
+			Error("Flash write error");
 		}
 	}
 
