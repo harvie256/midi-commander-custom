@@ -10,7 +10,7 @@ volatile uint8_t display_line_transmitting_flag = 0; // non zero indicates the l
 
 
 void ssd1306_DMATxLine(uint8_t line);
-
+uint8_t line_tx_buffer[SSD1306_WIDTH+6];
 
 // Call this function periodically from the systick handler to handle loading the DMA with screen updates.
 // Note this must have a lower premption priority than the DMA callback priority (i.e. I higher number on the NVIC.)
@@ -34,9 +34,12 @@ void ssd1306_Reset(void) {
     /* for I2C - do nothing */
 }
 
-//
-// 	Borrowed and modified from https://github.com/taburyak/STM32_OLED_SSD1306_HAL_DMA/blob/master/Src/ssd1306.c
-//
+/*
+ * These write command and data functions are used with the DMA outside of the main
+ * update transfers. The main update is all done within the ssd1306_DMATxLine function
+ * below because it wraps the page/column addressing commands and the page data transfer
+ * into a single run.
+ */
 void ssd1306_WriteCommand(uint8_t byte)
 {
 	while(HAL_I2C_GetState(&SSD1306_I2C_PORT) != HAL_I2C_STATE_READY);
@@ -161,13 +164,26 @@ void ssd1306_Fill(SSD1306_COLOR color) {
 }
 
 
-
 void ssd1306_DMATxLine(uint8_t line){
 	display_line_transmitting_flag = 1;
-    ssd1306_WriteCommand(0xB0 + line); // Set the current RAM page address.
-    ssd1306_WriteCommand(0x00);
-    ssd1306_WriteCommand(0x10);
-    ssd1306_WriteData(&SSD1306_Buffer[SSD1306_WIDTH*line],SSD1306_WIDTH);
+
+	// Loading the front of the buffer with the page and column address commands
+	// So the commands get transfered by DMA in the one go with the page of data.
+	// This then only requires a single DMA transaction per page, and no waiting
+	// as each transaction will be triggered by DMA completion.
+	line_tx_buffer[0] = 0xB0 + line;
+	line_tx_buffer[1] = 0x80; // CMD
+	line_tx_buffer[2] = 0;
+	line_tx_buffer[3] = 0x80; // CMD
+	line_tx_buffer[4] = 0x10;
+	line_tx_buffer[5] = 0x40;
+
+	memcpy(line_tx_buffer + 6, &SSD1306_Buffer[SSD1306_WIDTH*line], SSD1306_WIDTH);
+
+	while(HAL_I2C_GetState(&SSD1306_I2C_PORT) != HAL_I2C_STATE_READY);
+	display_transmit_data_flag = 1;
+	HAL_I2C_Mem_Write_DMA(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x80, 1, line_tx_buffer, SSD1306_WIDTH+6);
+
 }
 
 // Write the screenbuffer with changed to the screen
