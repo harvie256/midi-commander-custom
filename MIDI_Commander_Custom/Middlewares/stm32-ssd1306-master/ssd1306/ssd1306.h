@@ -128,6 +128,7 @@ typedef struct {
 } SSD1306_VERTEX;
 
 // Procedure definitions
+void ssd1306_tick(void);
 void ssd1306_Init(void);
 void ssd1306_Fill(SSD1306_COLOR color);
 void ssd1306_UpdateScreen(void);

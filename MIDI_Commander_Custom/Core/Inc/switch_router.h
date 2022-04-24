@@ -8,7 +8,7 @@
 #ifndef INC_SWITCH_ROUTER_H_
 #define INC_SWITCH_ROUTER_H_
 
-void handleSwitches(void);
+void handle_switches(void);
 void sw_led_init(void);
 
 #endif /* INC_SWITCH_ROUTER_H_ */

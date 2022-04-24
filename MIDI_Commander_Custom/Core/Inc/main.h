@@ -52,9 +52,9 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
-void Error(char *msg);
 
 /* USER CODE BEGIN EFP */
+void Error(char *msg);
 
 /* USER CODE END EFP */
 
