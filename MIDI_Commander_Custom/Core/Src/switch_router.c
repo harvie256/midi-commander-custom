@@ -102,7 +102,7 @@ void sw_scan(void){
 
 }
 
-static inline uint8_t get_sw_toggle_stage(sw_t *sw){
+static inline uint8_t get_sw_toggle_state(sw_t *sw){
 	return sw->switch_toggle_state & (1 << switch_current_page);
 }
 
@@ -110,7 +110,7 @@ static inline void toggle_sw_state(sw_t *sw){
 	sw->switch_toggle_state ^= (1 << switch_current_page);
 }
 
-uint8_t* getRomPointer(uint8_t page, uint8_t sw, uint8_t cmd){
+uint8_t* get_rom_pointer(uint8_t page, uint8_t sw, uint8_t cmd){
 	return pSwitchCmds + (MIDI_ROM_KEY_STRIDE * sw) + (MIDI_ROM_CMD_SIZE * cmd) + (MIDI_ROM_KEY_STRIDE * 8 * page);
 }
 
@@ -122,8 +122,8 @@ void sw_led_init(void){
 			// Clear the toggle bit
 			a_sw_obj[sw].led_cmd_toggle &= ~(1<<page);
 
-			for(int cmd=0; cmd<3; cmd++){
-				uint8_t *pCmd = getRomPointer(page, sw, cmd);
+			for(int cmd=0; cmd<MIDI_NUM_COMMANDS_PER_SWITCH; cmd++){
+				uint8_t *pCmd = get_rom_pointer(page, sw, cmd);
 				if(midiCmd_get_cmd_toggle(pCmd)){
 					a_sw_obj[sw].led_cmd_toggle |= (1<<page);
 				}
@@ -160,7 +160,7 @@ int get_available_delayed_cmd_slot(void){
 	return -1;
 }
 
-void handleDelayedCmds(void){
+void handle_delayed_cmds(void){
 	for(int i=0; i<MAX_DELAYED_CMDS; i++){
 		if(delayed_cmds[i].systick_timout < HAL_GetTick()){
 			uint8_t* pRom = delayed_cmds[i].pRomCmd;
@@ -179,7 +179,7 @@ void handleDelayedCmds(void){
 }
 
 // Sets the cmd point to switch off and the delay timeout into the delayed cmds table
-void setCmdDurationDelay(uint8_t *pRom){
+void set_cmd_duration_delay(uint8_t *pRom){
 	int slot = get_available_delayed_cmd_slot();
 	if(slot >= 0){
 		delayed_cmds[slot].pRomCmd = pRom;
@@ -187,74 +187,88 @@ void setCmdDurationDelay(uint8_t *pRom){
 	}
 }
 
-void handleCmdSwDown(uint8_t *pRom, uint8_t toggleState){
+void handle_cmd_sw_down(uint8_t *pRom, uint8_t toggleState){
+	/*
+	 * Assume success by default since this was the behavior before adding this status.
+	 */
+	int8_t status = 0;
+
 	switch(*pRom & 0xF0){
 	case CMD_PC_NIBBLE:
-		midiCmd_send_pc_command_from_rom(pRom);
+		status = midiCmd_send_pc_command_from_rom(pRom);
 		break;
 	case CMD_CC_NIBBLE:
 		if(midiCmd_get_cmd_toggle(pRom)){
-			midiCmd_send_cc_command_from_rom(pRom, toggleState);
+			status = midiCmd_send_cc_command_from_rom(pRom, toggleState);
 		} else {
 			// Not toggling, so set command and either set a duration or not
-			midiCmd_send_cc_command_from_rom(pRom, MIDI_CONTROL_ON);
+			status = midiCmd_send_cc_command_from_rom(pRom, MIDI_CONTROL_ON);
 		}
 		break;
 	case CMD_PB_NIBBLE:
 		if(midiCmd_get_cmd_toggle(pRom)){
-			midiCmd_send_pb_command_from_rom(pRom, toggleState);
+			status = midiCmd_send_pb_command_from_rom(pRom, toggleState);
 		} else {
 			// Not toggling, so set command and either set a duration or not
-			midiCmd_send_pb_command_from_rom(pRom, MIDI_CONTROL_ON);
+			status = midiCmd_send_pb_command_from_rom(pRom, MIDI_CONTROL_ON);
 			if(midiCmd_get_delay(pRom) != 0){
-				setCmdDurationDelay(pRom);
+				set_cmd_duration_delay(pRom);
 			}
 		}
 		break;
 	case CMD_NOTE_NIBBLE:
 		if(midiCmd_get_cmd_toggle(pRom)){
-			midiCmd_send_note_command_from_rom(pRom, toggleState);
+			status = midiCmd_send_note_command_from_rom(pRom, toggleState);
 		} else {
 			// Not toggling, so set command and either set a duration or not
-			midiCmd_send_note_command_from_rom(pRom, MIDI_CONTROL_ON);
+			status = midiCmd_send_note_command_from_rom(pRom, MIDI_CONTROL_ON);
 			if(midiCmd_get_delay(pRom) != 0){
-				setCmdDurationDelay(pRom);
+				set_cmd_duration_delay(pRom);
 			}
 		}
 		break;
 	case CMD_START_NIBBLE:
-		midiCmd_send_start_command();
+		status = midiCmd_send_start_command();
 		break;
 	case CMD_STOP_NIBBLE:
-		midiCmd_send_stop_command();
+		status = midiCmd_send_stop_command();
 		break;
 	default:
 		break;
 	}
+
+	if (status == ERROR_BUFFERS_FULL) {
+		Error("Buffers full");
+ 	}
 }
 
-void handleCmdSwUp(uint8_t *pRom, uint8_t toggleState){
+void handle_cmd_sw_up(uint8_t *pRom, uint8_t toggleState){
+	/*
+	 * Assume success by default since this was the behavior before adding this status.
+	 */
+	int8_t status = 0;
+
 	switch(*pRom & 0xF0){
 	case CMD_PC_NIBBLE:
 		break;
 	case CMD_CC_NIBBLE:
 		if(!midiCmd_get_cmd_toggle(pRom)){
-			midiCmd_send_cc_command_from_rom(pRom, MIDI_CONTROL_OFF);
+			status = midiCmd_send_cc_command_from_rom(pRom, MIDI_CONTROL_OFF);
 		}
 		break;
 	case CMD_PB_NIBBLE:
-		if(!midiCmd_get_cmd_toggle(pRom)){
-			if(midiCmd_get_delay(pRom) == 0){
+		if(!midiCmd_get_cmd_toggle(pRom)) {
+			if(midiCmd_get_delay(pRom) == 0) {
 				// No cmd duration delay, so immediately release
-				midiCmd_send_pb_command_from_rom(pRom, MIDI_CONTROL_OFF);
+				status = midiCmd_send_pb_command_from_rom(pRom, MIDI_CONTROL_OFF);
 			}
 		}
 		break;
 	case CMD_NOTE_NIBBLE:
-		if(!midiCmd_get_cmd_toggle(pRom)){
-			if(midiCmd_get_delay(pRom) == 0){
+		if(!midiCmd_get_cmd_toggle(pRom)) {
+			if(midiCmd_get_delay(pRom) == 0) {
 				// No cmd duration delay, so immediately release
-				midiCmd_send_note_command_from_rom(pRom, MIDI_CONTROL_OFF);
+				status = midiCmd_send_note_command_from_rom(pRom, MIDI_CONTROL_OFF);
 			}
 		}
 		break;
@@ -265,25 +279,29 @@ void handleCmdSwUp(uint8_t *pRom, uint8_t toggleState){
 	default:
 		break;
 	}
+
+	if (status == ERROR_BUFFERS_FULL) {
+		Error("Buffers full");
+ 	}
 }
 
-void setLed(uint8_t sw_no, uint8_t state){
+void set_led(uint8_t sw_no, uint8_t state){
 	GPIO_PinState pinState = (state) ? GPIO_PIN_RESET : GPIO_PIN_SET;
 	HAL_GPIO_WritePin(a_sw_obj[sw_no].led_gpio_port, a_sw_obj[sw_no].led_gpio_pin, pinState);
 
 }
 
-void updateLedsOnBankChange(void){
+void update_leds_on_bank_change(void){
 	for(int i=0; i<8; i++){
 		if(a_sw_obj[i].led_cmd_toggle & (1<<switch_current_page)){
-			setLed(i,get_sw_toggle_stage(&a_sw_obj[i]));
+			set_led(i,get_sw_toggle_state(&a_sw_obj[i]));
 		} else {
-			setLed(i,RESET);
+			set_led(i,RESET);
 		}
 	}
 }
 
-void handleSwitches(void){
+void handle_switches(void){
 
 	// The Command switches
 	for(int i=0; i<8; i++){
@@ -296,25 +314,25 @@ void handleSwitches(void){
 
 					// Either toggle the LED, or set it if not toggling
 					if(a_sw_obj[i].led_cmd_toggle & (1<<switch_current_page)){
-						setLed(i,get_sw_toggle_stage(&a_sw_obj[i]));
+						set_led(i,get_sw_toggle_state(&a_sw_obj[i]));
 					} else {
-						setLed(i,SET);
+						set_led(i,SET);
 					}
 
-					for(int j=0; j<3; j++){
-						handleCmdSwDown(pSwitchCmds + (MIDI_ROM_KEY_STRIDE * (i + switch_current_page*8)) + (MIDI_ROM_CMD_SIZE * j),
-								get_sw_toggle_stage(&a_sw_obj[i]));
+					for(int j=0; j<MIDI_NUM_COMMANDS_PER_SWITCH; j++){
+						handle_cmd_sw_down(pSwitchCmds + (MIDI_ROM_KEY_STRIDE * (i + switch_current_page*8)) + (MIDI_ROM_CMD_SIZE * j),
+								get_sw_toggle_state(&a_sw_obj[i]));
 					}
 				}else {
 					// Switch up
 					// Clear the LED if it's not toggling.
 					if(!(a_sw_obj[i].led_cmd_toggle & (1<<switch_current_page))){
-						setLed(i, RESET);
+						set_led(i, RESET);
 					}
 
-					for(int j=0; j<3; j++){
-						handleCmdSwUp(pSwitchCmds + (MIDI_ROM_KEY_STRIDE * (i + switch_current_page*8)) + (MIDI_ROM_CMD_SIZE * j),
-								get_sw_toggle_stage(&a_sw_obj[i]));
+					for(int j=0; j<MIDI_NUM_COMMANDS_PER_SWITCH; j++){
+						handle_cmd_sw_up(pSwitchCmds + (MIDI_ROM_KEY_STRIDE * (i + switch_current_page*8)) + (MIDI_ROM_CMD_SIZE * j),
+								get_sw_toggle_state(&a_sw_obj[i]));
 					}
 
 				}
@@ -322,7 +340,7 @@ void handleSwitches(void){
 
 	}
 
-	handleDelayedCmds();
+	handle_delayed_cmds();
 
 	// The bank change switches
 	if(port_A_switches_changed & SW_E_Pin){
@@ -334,7 +352,7 @@ void handleSwitches(void){
 
 			if(switch_current_page > 0){
 				switch_current_page--;
-				updateLedsOnBankChange();
+				update_leds_on_bank_change();
 				display_setBankName(switch_current_page);
 			}
 		} else {
@@ -351,7 +369,7 @@ void handleSwitches(void){
 
 			if(switch_current_page < 7){
 				switch_current_page++;
-				updateLedsOnBankChange();
+				update_leds_on_bank_change();
 				display_setBankName(switch_current_page);
 			}
 		} else {

@@ -50,6 +50,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
+DMA_HandleTypeDef hdma_i2c1_tx;
 
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_tx;
@@ -89,7 +90,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+   HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -114,15 +115,19 @@ int main(void)
   // Reset the USB interface in case it's still plugged in.
   HAL_GPIO_WritePin(USB_ID_GPIO_Port, USB_ID_Pin, GPIO_PIN_RESET);
 
-  // Check we've got a 512kB device, in case Melo switch to a smaller device at some point
+  display_init();
+
+  // Check we've got a 256kB device, in case Melo switch to a smaller device at some point
   uint16_t flash_size = (*(uint16_t*)FLASHSIZE_BASE);
-  if(flash_size < 512){
-	  Error_Handler();
+  uint16_t min_size = 256;
+  if(flash_size < min_size) {
+	  char msg[25];
+	  sprintf(msg, "Mem %3dkb < %3dkb", flash_size, min_size);
+	  Error(msg);
   }
 
-
-  display_init();
   display_setConfigName();
+
   sw_led_init();
 
   HAL_Delay(1000);
@@ -138,7 +143,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  handleSwitches();
+	  handle_switches();
 
     /* USER CODE END WHILE */
 
@@ -269,6 +274,9 @@ static void MX_DMA_Init(void)
   __HAL_RCC_DMA1_CLK_ENABLE();
 
   /* DMA interrupt init */
+  /* DMA1_Channel6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
   /* DMA1_Channel7_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
@@ -346,6 +354,24 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+/*
+ * @brief This function can be called to display an error message on the screen,
+ * if the display is on, before calling Error_Handler() to stop all operations.
+ */
+void Error(char *msg) {
+	if (ssd1306_GetDisplayOn() == 0) {
+		/* Display is on */
+		ssd1306_Fill(Black);
+		ssd1306_SetCursor(2, 0);
+		ssd1306_WriteString("Error:", Font_6x8, White);
+		ssd1306_SetCursor(2, 9);
+		ssd1306_WriteString(msg, Font_6x8, White);
+		ssd1306_UpdateScreen();
+	}
+
+	Error_Handler();
+}
 
 /* USER CODE END 4 */
 

@@ -3,55 +3,65 @@
 #include <stdlib.h>
 #include <string.h>  // For memcpy
 
-#if defined(SSD1306_USE_I2C)
+
+volatile uint8_t display_transmit_line = 0; // The next line to be transmitted to the display via DMA.  0 indicates that it is idle.
+volatile uint8_t display_transmit_data_flag = 0; // non zero indicates the last thing to be transmitted was a data packet. This is required to know how to handle the transfer complete callback.
+volatile uint8_t display_line_transmitting_flag = 0; // non zero indicates the line transfer has started, and a new transfer should not start until this is cleared.
+
+
+void ssd1306_DMATxLine(uint8_t line);
+
+
+// Call this function periodically from the systick handler to handle loading the DMA with screen updates.
+// Note this must have a lower premption priority than the DMA callback priority (i.e. I higher number on the NVIC.)
+// Otherwise it will hang in a deadlock on sending commands from within the systick context.
+void ssd1306_tick(void){
+	// Line tx in progress
+	if(display_line_transmitting_flag){
+		return;
+	}
+
+	if(display_transmit_line != 0){
+		ssd1306_DMATxLine(display_transmit_line);
+		display_transmit_line++;
+		if(display_transmit_line > 7){
+			display_transmit_line = 0;
+		}
+	}
+}
 
 void ssd1306_Reset(void) {
     /* for I2C - do nothing */
 }
 
-// Send a byte to the command register
-void ssd1306_WriteCommand(uint8_t byte) {
-    HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x00, 1, &byte, 1, HAL_MAX_DELAY);
+//
+// 	Borrowed and modified from https://github.com/taburyak/STM32_OLED_SSD1306_HAL_DMA/blob/master/Src/ssd1306.c
+//
+void ssd1306_WriteCommand(uint8_t byte)
+{
+	while(HAL_I2C_GetState(&SSD1306_I2C_PORT) != HAL_I2C_STATE_READY);
+	display_transmit_data_flag = 0;
+	HAL_I2C_Mem_Write_DMA(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x00, 1, &byte, 1);
 }
 
-// Send data
-void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
-    HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x40, 1, buffer, buff_size, HAL_MAX_DELAY);
-
+void ssd1306_WriteData(uint8_t* buffer, size_t buff_size)
+{
+	while(HAL_I2C_GetState(&SSD1306_I2C_PORT) != HAL_I2C_STATE_READY);
+	display_transmit_data_flag = 1;
+	HAL_I2C_Mem_Write_DMA(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x40, 1, buffer, buff_size);
 }
 
-#elif defined(SSD1306_USE_SPI)
 
-void ssd1306_Reset(void) {
-    // CS = High (not selected)
-    HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_SET);
+void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c){
 
-    // Reset the OLED
-    HAL_GPIO_WritePin(SSD1306_Reset_Port, SSD1306_Reset_Pin, GPIO_PIN_RESET);
-    HAL_Delay(10);
-    HAL_GPIO_WritePin(SSD1306_Reset_Port, SSD1306_Reset_Pin, GPIO_PIN_SET);
-    HAL_Delay(10);
+	if(hi2c->Instance == SSD1306_I2C_PORT.Instance)
+	{
+		// This will indicate the end of a transmit line.
+		if(display_transmit_data_flag){
+			display_line_transmitting_flag = 0;
+		}
+	}
 }
-
-// Send a byte to the command register
-void ssd1306_WriteCommand(uint8_t byte) {
-    HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_RESET); // select OLED
-    HAL_GPIO_WritePin(SSD1306_DC_Port, SSD1306_DC_Pin, GPIO_PIN_RESET); // command
-    HAL_SPI_Transmit(&SSD1306_SPI_PORT, (uint8_t *) &byte, 1, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_SET); // un-select OLED
-}
-
-// Send data
-void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
-    HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_RESET); // select OLED
-    HAL_GPIO_WritePin(SSD1306_DC_Port, SSD1306_DC_Pin, GPIO_PIN_SET); // data
-    HAL_SPI_Transmit(&SSD1306_SPI_PORT, buffer, buff_size, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_SET); // un-select OLED
-}
-
-#else
-#error "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro"
-#endif
 
 
 // Screenbuffer
@@ -72,6 +82,7 @@ SSD1306_Error_t ssd1306_FillBuffer(uint8_t* buf, uint32_t len) {
 
 // Initialize the oled screen
 void ssd1306_Init(void) {
+
     // Reset OLED
     ssd1306_Reset();
 
@@ -87,11 +98,7 @@ void ssd1306_Init(void) {
 
     ssd1306_WriteCommand(0xB0); //Set Page Start Address for Page Addressing Mode,0-7
 
-#ifdef SSD1306_MIRROR_VERT
-    ssd1306_WriteCommand(0xC0); // Mirror vertically
-#else
     ssd1306_WriteCommand(0xC8); //Set COM Output Scan Direction
-#endif
 
     ssd1306_WriteCommand(0x00); //---set low column address
     ssd1306_WriteCommand(0x10); //---set high column address
@@ -100,35 +107,13 @@ void ssd1306_Init(void) {
 
     ssd1306_SetContrast(0xFF);
 
-#ifdef SSD1306_MIRROR_HORIZ
-    ssd1306_WriteCommand(0xA0); // Mirror horizontally
-#else
     ssd1306_WriteCommand(0xA1); //--set segment re-map 0 to 127 - CHECK
-#endif
 
-#ifdef SSD1306_INVERSE_COLOR
-    ssd1306_WriteCommand(0xA7); //--set inverse color
-#else
     ssd1306_WriteCommand(0xA6); //--set normal color
-#endif
 
-// Set multiplex ratio.
-#if (SSD1306_HEIGHT == 128)
-    // Found in the Luma Python lib for SH1106.
-    ssd1306_WriteCommand(0xFF);
-#else
     ssd1306_WriteCommand(0xA8); //--set multiplex ratio(1 to 64) - CHECK
-#endif
 
-#if (SSD1306_HEIGHT == 32)
-    ssd1306_WriteCommand(0x1F); //
-#elif (SSD1306_HEIGHT == 64)
     ssd1306_WriteCommand(0x3F); //
-#elif (SSD1306_HEIGHT == 128)
-    ssd1306_WriteCommand(0x3F); // Seems to work for 128px high displays too.
-#else
-#error "Only 32, 64, or 128 lines of height are supported!"
-#endif
 
     ssd1306_WriteCommand(0xA4); //0xa4,Output follows RAM content;0xa5,Output ignores RAM content
 
@@ -142,15 +127,8 @@ void ssd1306_Init(void) {
     ssd1306_WriteCommand(0x22); //
 
     ssd1306_WriteCommand(0xDA); //--set com pins hardware configuration - CHECK
-#if (SSD1306_HEIGHT == 32)
-    ssd1306_WriteCommand(0x02);
-#elif (SSD1306_HEIGHT == 64)
+
     ssd1306_WriteCommand(0x12);
-#elif (SSD1306_HEIGHT == 128)
-    ssd1306_WriteCommand(0x12);
-#else
-#error "Only 32, 64, or 128 lines of height are supported!"
-#endif
 
     ssd1306_WriteCommand(0xDB); //--set vcomh
     ssd1306_WriteCommand(0x20); //0x20,0.77xVcc
@@ -182,21 +160,36 @@ void ssd1306_Fill(SSD1306_COLOR color) {
     }
 }
 
-// Write the screenbuffer with changed to the screen
-void ssd1306_UpdateScreen(void) {
-    // Write data to each page of RAM. Number of pages
-    // depends on the screen height:
-    //
-    //  * 32px   ==  4 pages
-    //  * 64px   ==  8 pages
-    //  * 128px  ==  16 pages
-    for(uint8_t i = 0; i < SSD1306_HEIGHT/8; i++) {
-        ssd1306_WriteCommand(0xB0 + i); // Set the current RAM page address.
-        ssd1306_WriteCommand(0x00);
-        ssd1306_WriteCommand(0x10);
-        ssd1306_WriteData(&SSD1306_Buffer[SSD1306_WIDTH*i],SSD1306_WIDTH);
-    }
+
+
+void ssd1306_DMATxLine(uint8_t line){
+	display_line_transmitting_flag = 1;
+    ssd1306_WriteCommand(0xB0 + line); // Set the current RAM page address.
+    ssd1306_WriteCommand(0x00);
+    ssd1306_WriteCommand(0x10);
+    ssd1306_WriteData(&SSD1306_Buffer[SSD1306_WIDTH*line],SSD1306_WIDTH);
 }
+
+// Write the screenbuffer with changed to the screen
+
+// Screen update dev:
+// Update time using basic HAL instructions with no DMA - 26ms
+// Update time using DMA instructions - 23ms
+// This implementation uses a call back system to non-block the CPU, update time should be a bit longer than the 23ms as each line
+// is only started on systick 1ms boundaries, but expect somewhere < 30ms.  Real world tests have shown between 25-30ms.
+// However these times are somewhat irrelevant now, since the processor isn't blocked and these displays aren't really much good for animation.
+void ssd1306_UpdateScreen(void) {
+
+	// Delay until the previous update has finished
+	while (display_transmit_line != 0)
+		__NOP();
+
+	ssd1306_DMATxLine(0);
+	display_transmit_line = 1;
+}
+
+
+
 
 //    Draw one pixel in the screenbuffer
 //    X => X Coordinate

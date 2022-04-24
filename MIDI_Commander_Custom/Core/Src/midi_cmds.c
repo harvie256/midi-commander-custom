@@ -4,9 +4,12 @@
  *  Created on: Jul 6, 2021
  *      Author: D Harvie
  */
+#include "midi_cmds.h"
 #include "main.h"
+#include "flash_midi_settings.h"
 #include "midi_defines.h"
 #include "usbd_midi_if.h"
+#include "ssd1306.h"
 
 extern UART_HandleTypeDef huart2;
 
@@ -20,11 +23,11 @@ uint8_t midi_usb_assembly_buffer[16];
  *
  * Because the midi serial port is relatively slow (compared to USB) and it has no inherent buffering in the stack beyond
  * the DMA transfer that is started, we're defining a series of "mailbox" type buffers that will be sent when something is
- * written to them.
+ * written to them. Since each push of a switch can potentially send MIDI_NUM_COMMANDS_PER_SWITCH commands as well as another
+ * MIDI_NUM_COMMANDS_PER_SWITCH commands if not in toggle mode, then we need 2 * MIDI_NUM_COMMANDS_PER_SWITCH buffers.
  */
-#define NO_BUFFERS (4)
+#define NO_BUFFERS (2 * MIDI_NUM_COMMANDS_PER_SWITCH)
 #define BUFFER_SIZE (16)
-#define ERROR_BUFFERS_FULL (-1)
 
 // Implementing as a series of buffers
 uint8_t midi_uart_out_buffer[NO_BUFFERS][BUFFER_SIZE];
@@ -34,7 +37,7 @@ uint8_t last_transmitted_buffer = NO_BUFFERS -1; // When a buffer is given to th
 // Note should only be called from critical section, not thread safe
 static int8_t get_next_available_tx_buffer(void){
 	// Starting at the last sent buffer, loop through and find the next available.
-	for(int i=0; i<4; i++){
+	for(int i=0; i<NO_BUFFERS; i++){
 		uint8_t n = (last_transmitted_buffer + i + 1) % NO_BUFFERS;
 		if(midi_uart_out_buffer_bytes_to_tx[n] == 0){
 			return n;
@@ -59,7 +62,7 @@ uint32_t midiCmd_get_delay(uint8_t *pRom){
 void midi_serial_start_next_dma(void){
 	uint8_t buffer_to_transmit = 0xFF;
 	// Find the next buffer ready for transmit
-	for(int i=0; i<4; i++){
+	for(int i=0; i<NO_BUFFERS; i++){
 		uint8_t n = (last_transmitted_buffer + i + 1) % NO_BUFFERS;
 		if(midi_uart_out_buffer_bytes_to_tx[n] != 0){
 			buffer_to_transmit = n;
@@ -67,11 +70,10 @@ void midi_serial_start_next_dma(void){
 		}
 	}
 
-	if(buffer_to_transmit < 4){
+	if(buffer_to_transmit < NO_BUFFERS){
 		// We've found a valid buffer to transmit
 		while(HAL_UART_Transmit_DMA(&huart2, midi_uart_out_buffer[buffer_to_transmit],
-				midi_uart_out_buffer_bytes_to_tx[buffer_to_transmit]) != HAL_OK)
-			;
+				midi_uart_out_buffer_bytes_to_tx[buffer_to_transmit]) != HAL_OK);
 		last_transmitted_buffer = buffer_to_transmit;
 	}
 
@@ -252,10 +254,13 @@ int8_t midiCmd_send_cc_command_from_rom(uint8_t *pRom, uint8_t on_off){
 	uint8_t *serialBuf = &(midi_uart_out_buffer[buffer_no][0]);
 	uint8_t *usbBuf = midi_usb_assembly_buffer;
 
+	uint8_t cc_number = pRom[1] & 0x7F; // CC Number
+	uint8_t cc_value = (on_off) ?  pRom[2] & 0x7F : pRom[3] & 0x7F; // Value
+
 	*(usbBuf++) = CIN_CONTROL_CHANGE;
 	*(usbBuf++) = 0xB0 | (pRom[0] & 0xF); // CC and Channel
-	*(usbBuf++) = pRom[1] & 0x7F; // CC Number
-	*(usbBuf++) = (on_off) ?  pRom[2] & 0x7F : pRom[3] & 0x7F; // Value
+	*(usbBuf++) = cc_number;
+	*(usbBuf++) = cc_value;
 
 	memcpy(serialBuf, (usbBuf-3), 3);
 	serialBuf += 3;
@@ -268,7 +273,22 @@ int8_t midiCmd_send_cc_command_from_rom(uint8_t *pRom, uint8_t on_off){
 	MIDI_DataTx(midi_usb_assembly_buffer, usb_bytes_to_tx);
 
 	midi_serial_transmit();
-	return 0;
+
+	/*
+	 * Displaying messages on screen likely involves a delay which can be
+	 * detrimental on the timing of MIDI messages. So keep this commented and
+	 * only use for debugging. Using the display here also hides issues with
+	 * the serial transmission buffers. The delay in the display update allows
+	 * serial transmission to finish before the next time we enter this function.
+	 * So we never use multiple buffers at the same time and this can hide issues.
+	 */
+//	ssd1306_SetCursor(2, 10);
+//	char msg[25];
+//	sprintf(msg, "CC %d = %d", cc_number, cc_value);
+//	ssd1306_WriteString(msg, Font_6x8, White);
+//	ssd1306_UpdateScreen();
+
+ 	return 0;
 }
 
 

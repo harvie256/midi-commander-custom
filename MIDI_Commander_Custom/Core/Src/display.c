@@ -14,13 +14,23 @@
 void display_init(void){
     ssd1306_Init();
 
-    ssd1306_SetCursor(5,0);
-
-    ssd1306_WriteString("*CUSTOM*", Font_11x18, White);
     ssd1306_SetCursor(5, 22);
     ssd1306_WriteString(FIRMWARE_VERSION, Font_7x10, White);
 
-    ssd1306_UpdateScreen();
+    // A little animation
+
+
+    for(int i=0; i < 11; i++){
+    	ssd1306_SetCursor(i*11,0);
+		ssd1306_WriteString("#", Font_11x18, White);
+		ssd1306_SetCursor(i*11,46);
+		ssd1306_WriteString("#", Font_11x18, White);
+
+		ssd1306_UpdateScreen();
+		HAL_Delay(50);
+    }
+
+    __NOP();
 }
 
 void display_setConfigName(void){
