@@ -29,7 +29,6 @@ I have had a lot of issues under Windows 10, and there are reports from others o
 
 - Firmware can be loaded through the normal DFU update process.
 - Configuration has been moved to the FLASH memory, so this will not affect the standard Melo firmware configuration that is stored in an external EEPROM.
-- Provides SYSEX tools for downloading and uploading both the configuration section for this firmware.
 
 # Still to come
 - Expression Pedal inputs
