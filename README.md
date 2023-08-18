@@ -80,8 +80,8 @@ Then prepare a Python environment as follows:
 
    ```
    cd /path/to/midi-commander-custom
-   pip install -r python/requirements.txt
-   python python/CSV_to_Flash.py -h
+   python3 -m pip install -r python/requirements.txt
+   python3 python/CSV_to_Flash.py -h
    ```
 
    If your setup is successful, the last command should display the help message of the tool.
@@ -94,7 +94,7 @@ Once your Python environment is operational, you can load your configuration ont
 
    ```
    cd /path/to/midi-commander-custom
-   python python/CSV_to_Flash.py /path/to/you/configuration-file.csv
+   python3 python/CSV_to_Flash.py /path/to/you/configuration-file.csv
    ```
 
 The tool will convert the CSV file to a binary format and transmit it to the Midi Commander. At the end of the operation the Midi Commander should restart to load the new configuration.
