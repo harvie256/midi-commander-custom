@@ -32,6 +32,8 @@
 # Kernel Module Compile Results
 *.mod*
 *.cmd
+!Launch MIDI Commander Studio.cmd
+!Stop MIDI Commander Studio.cmd
 .tmp_versions/
 modules.order
 Module.symvers
@@ -42,3 +44,13 @@ dkms.conf
 
 # macOS Finder metadata
 .DS_Store
+
+# MIDI Commander Studio local runtime
+.studio-venv*/
+.studio-runtime/
+.studio-tools/
+studio/frontend/node_modules/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.tsbuildinfo

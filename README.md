@@ -11,6 +11,64 @@ This project provides the following components that work together:
 
 3. The `python/CSV_to_Flash.py` tool that can load a configuration spreadsheet to the Midi Commander through a simple USB connection
 
+# MIDI Commander Studio (macOS and Windows GUI)
+
+This repository now includes **MIDI Commander Studio**, a local visual editor for macOS and Windows. It provides a pedal-style bank and button editor, project autosave, CSV import/export, direct configuration upload, MIDI device diagnostics, and a guarded firmware installation workflow.
+
+## Purpose
+
+MIDI Commander Studio replaces the manual CSV-editing and command-line upload workflow with one local browser interface. It is intended for users of this repository's custom firmware who want to:
+
+- visually configure all eight banks and eight switches;
+- assign up to ten ordered MIDI commands to each switch;
+- validate MIDI channels, controller numbers, values, names, and firmware limits before uploading;
+- import or export repository-compatible CSV files;
+- install the bundled custom firmware with explicit DFU target checks; and
+- upload a validated 2,688-byte configuration directly over USB MIDI.
+
+The application runs locally at `http://127.0.0.1:8765`. Project data stays in the browser unless the user explicitly saves or exports it.
+
+## Platform status
+
+| Platform | Status |
+| --- | --- |
+| macOS | **Tested end-to-end with a physical MIDI Commander:** Studio launch, custom firmware installation, MIDI detection, validation, and configuration upload are working. |
+| Windows 10/11 (64-bit) | Launcher, dependency setup, UI, automated tests, and CI are included. **Physical Windows firmware and MIDI upload testing is still pending**, so Windows support should be treated as beta. |
+
+## Typical workflow
+
+1. Keep a matching stock firmware recovery file before replacing firmware.
+2. Start MIDI Commander Studio using the launcher for your operating system.
+3. If the pedal still has stock firmware, use **Firmware** once to install the bundled custom firmware, then power-cycle normally.
+4. Use **Editor** to configure banks, switches, and MIDI commands. Fix any validation messages shown by Studio.
+5. Use **Device** to select the pedal's MIDI input/output ports and upload the configuration.
+6. Save a `.mcs.json` project for future editing and optionally export CSV for the original tooling.
+
+## Start the Studio on macOS
+
+1. In Finder, open this repository folder.
+2. Double-click `Launch MIDI Commander Studio.command`.
+3. On the first launch, allow a minute for the private Python environment to be prepared. Later launches are immediate.
+4. The Studio opens in your default browser at `http://127.0.0.1:8765`.
+
+If macOS refuses to open the launcher, Control-click it, choose **Open**, and confirm once. The app runs only on your Mac and binds to the local loopback address.
+
+## Start the Studio on Windows
+
+> **Testing status:** Windows hardware testing is pending. Keep a recovery file and use the Windows firmware workflow as beta software until it has been verified with a physical pedal.
+
+1. Install [Python 3](https://www.python.org/downloads/windows/) and enable **Add Python to PATH** in its installer.
+2. Extract the repository ZIP to a normal writable folder; do not run it from inside the ZIP viewer.
+3. Double-click `Launch MIDI Commander Studio.cmd`.
+4. On the first launch, allow a minute for the private Python environment to be prepared. Later launches are immediate.
+5. The Studio opens in your default browser at `http://127.0.0.1:8765`.
+
+Windows SmartScreen may show a warning because the open-source launcher is not code-signed. Choose **More info → Run anyway** after confirming that you downloaded the repository from its expected GitHub page. See [`docs/WINDOWS.md`](docs/WINDOWS.md) for firmware-driver setup, troubleshooting, and verification details.
+
+Use the **Editor** to design banks and commands, **Device** to upload a configuration while the pedal is in normal mode, and **Firmware** only when installing the bundled custom firmware in DFU mode. The Studio automatically creates repository-compatible CSV files, so the command-line workflow remains available.
+
+See [`studio/README.md`](studio/README.md) for implementation and development details.
+
 # Build status
 
 There is the current build under `DFU\DFU_OUT\generated_xxx.dfu`. See the instructions in the [development environment section](#basic-instructions-for-setting-up-development-environment) for building the firmware locally and/or loading it to the device.

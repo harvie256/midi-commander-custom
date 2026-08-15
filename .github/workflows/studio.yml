@@ -1,0 +1,55 @@
+name: MIDI Commander Studio
+
+on:
+  push:
+    paths:
+      - ".github/workflows/studio.yml"
+      - "studio/**"
+      - "python/**"
+      - "Launch MIDI Commander Studio.*"
+      - "Stop MIDI Commander Studio.*"
+  pull_request:
+    paths:
+      - ".github/workflows/studio.yml"
+      - "studio/**"
+      - "python/**"
+      - "Launch MIDI Commander Studio.*"
+      - "Stop MIDI Commander Studio.*"
+
+jobs:
+  test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: studio/requirements.txt
+
+      - name: Install backend dependencies
+        run: python -m pip install -r studio/requirements.txt pytest
+
+      - name: Test backend
+        run: python -m pytest -q studio/backend/tests
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: studio/frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: studio/frontend
+        run: npm ci
+
+      - name: Check and build frontend
+        working-directory: studio/frontend
+        run: npm run lint && npm run build
