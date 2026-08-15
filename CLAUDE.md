@@ -8,7 +8,7 @@ Replacement firmware for the MeloAudio MIDI Commander (a MIDI foot controller), 
 
 1. **Firmware** — `MIDI_Commander_Custom/`, an STM32CubeIDE project for an STM32F103RET (256 KiB+ flash, 12 MHz crystal, SSD1306 OLED on I2C1 @0x3C, MIDI DIN out on USART2).
 2. **Config tool** — `python/CSV_to_Flash.py`, packs a CSV config into the firmware's binary layout and pushes it over USB MIDI SysEx.
-3. **DFU packaging** — `DFU/`, Windows ST DfuSe tools plus `BuildDFUAutomation.py` to wrap a build into a `.dfu`.
+3. **DFU packaging** — `DFU/bin_to_dfu.py` wraps a build into a `.dfu`; `DFU/MidiCommander_DFU_APP/` holds the vendored ST Windows tools and drivers.
 
 There is no test suite anywhere in the repo. Verification is done on hardware.
 
@@ -26,7 +26,7 @@ cd MIDI_Commander_Custom
 cmake --preset "DFU Release" && cmake --build --preset "DFU Release"
 ```
 
-Output lands in `build/<preset>/` as `.elf`, `.hex` (consumed by `DFU/BuildDFUAutomation.py`), and `.bin` (consumed by `dfu-util`). `-DTOOLCHAIN_PREFIX=/path/to/bin/` selects a compiler that isn't on `PATH`.
+Output lands in `build/<preset>/` as `.elf`, `.hex`, `.bin` (what `dfu-util` loads), and — for `DFU Release` only — a packed `.dfu`. `-DTOOLCHAIN_PREFIX=/path/to/bin/` selects a compiler that isn't on `PATH`.
 
 The DFU offset lives in **three** places that must move together, and the third is easy to miss:
 
@@ -43,12 +43,14 @@ arm-none-eabi-objdump -d "build/DFU Release/MIDI_Commander_Custom.elf" --disasse
 
 The disassembly must store `0x08003000` to `0xE000ED08`; in a `Debug` build `SystemInit` is a no-op.
 
-**Packing a `.dfu`:** `python3 DFU/bin_to_dfu.py <build.hex> -o out.dfu` — pure Python, no ST tools needed. A `.hex` carries its own load address; a `.bin` needs `-a 0x8003000`. Output is byte-identical to `DfuFileMgr.exe` apart from the 255-byte target-name field, where ST's tool emits uninitialised heap past `"ST..."` and this writes zero padding. `DFU/BuildDFUAutomation.py` (Windows, `pywinauto`, drives `DfuFileMgr.exe` through its GUI) does the same job and is now redundant.
+**Packing a `.dfu`:** `DFU/bin_to_dfu.py` — pure Python, no ST tools. The `DFU Release` build runs it automatically as a post-build step (guarded by `find_package(Python3)`, warning rather than failing if absent); run it by hand as `python3 DFU/bin_to_dfu.py <build.hex> -o out.dfu` to repack without rebuilding. A `.hex` carries its own load address; a `.bin` needs `-a 0x8003000`. Output is byte-identical to `DfuFileMgr.exe` apart from the 255-byte target-name field, where ST's tool emits uninitialised heap past `"ST..."` and this writes zero padding.
+
+Only the DFU variant gets packed, deliberately — a `Debug` build is linked at `0x8000000`, so a `.dfu` of it would overwrite the bootloader if uploaded.
 
 **Flashing a build:**
-- Windows: `DFU/DownloadToMidiCommandByDFU.bat`, which runs the bundled `DfuSeCommand.exe` against the newest file in `DFU/DFU_OUT/`.
-- macOS/Linux: `dfu-util --alt 0 -s 0x8003000 --download "MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin"` — pass the load address explicitly since `dfu-util` can't build a `.dfu`.
+- `dfu-util --alt 0 -s 0x8003000 --download "MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin"` — the `.bin` needs the address named explicitly; the `.dfu` carries it, so `dfu-util --alt 0 --download <file.dfu>` also works.
 - Device enters DFU mode by holding `bank down` + `D` while pressing power.
+- The vendored ST Windows tools under `DFU/MidiCommander_DFU_APP/` (DfuSeDemo, drivers) are kept for Windows users flashing by hand; nothing in the repo drives them any more.
 
 **Python tooling:**
 

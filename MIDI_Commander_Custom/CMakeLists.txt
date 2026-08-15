@@ -130,10 +130,37 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     LINK_DEPENDS ${LINKER_SCRIPT}
 )
 
-# The DFU tooling consumes the .hex (DFU/BuildDFUAutomation.py) and dfu-util
-# consumes the .bin, so emit both for every build.
+# dfu-util loads the .bin directly, and the .hex is what gets packed into the
+# .dfu below, so emit both for every build.
+set(ARTEFACT_BASE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME})
+
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${PROJECT_NAME}>
-    COMMAND ${CMAKE_OBJCOPY} -O ihex   $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.hex
-    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.bin
+    COMMAND ${CMAKE_OBJCOPY} -O ihex   $<TARGET_FILE:${PROJECT_NAME}> ${ARTEFACT_BASE}.hex
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${PROJECT_NAME}> ${ARTEFACT_BASE}.bin
 )
+
+#
+# Pack the upload package, for the DFU variant only.
+#
+# A Debug build is linked at 0x8000000, so packaging one would produce a .dfu
+# that overwrites the bootloader if it were ever uploaded. Only the offset build
+# is safe to distribute this way.
+#
+if(DFU_BOOTLOADER_OFFSET)
+    find_package(Python3 COMPONENTS Interpreter)
+
+    if(Python3_FOUND)
+        set(DFU_PACKER ${CMAKE_CURRENT_SOURCE_DIR}/../DFU/bin_to_dfu.py)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${Python3_EXECUTABLE} ${DFU_PACKER}
+                    ${ARTEFACT_BASE}.hex -o ${ARTEFACT_BASE}.dfu
+            BYPRODUCTS ${ARTEFACT_BASE}.dfu
+            VERBATIM
+        )
+    else()
+        message(WARNING
+            "Python 3 was not found, so no .dfu will be packed. The .bin can "
+            "still be flashed with: dfu-util --alt 0 -s 0x8003000 --download ...")
+    endif()
+endif()

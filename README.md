@@ -118,11 +118,15 @@ cmake --build --preset "DFU Release"
 
 There are two build presets. `DFU Release` is the one to flash through the DFU bootloader: it is optimised, linked at `0x8003000` with the offset linker script, and relocates the vector table to match. `Debug` is unoptimised and linked at the start of flash for use with an ST-Link debugger.
 
-Each build writes `MIDI_Commander_Custom.elf`, `.hex`, and `.bin` into `build/<preset name>/`.
+Each build writes `MIDI_Commander_Custom.elf`, `.hex`, and `.bin` into `build/<preset name>/`. The `DFU Release` preset additionally packs `MIDI_Commander_Custom.dfu`, ready to upload — building it is a single step, and no ST tooling is involved.
 
-## Building a DFU file
+The `Debug` preset deliberately does not produce a `.dfu`. It is linked at the start of flash, so uploading one through the bootloader would overwrite the bootloader itself.
 
-`DFU/bin_to_dfu.py` packs a build into the `.dfu` package that the ST upload tools expect. It needs nothing but Python and runs on any platform:
+Packing needs Python 3 on the `PATH`. If CMake cannot find it you still get the `.elf`, `.hex`, and `.bin`, and the build prints a warning rather than failing.
+
+### Packing a DFU file by hand
+
+`DFU/bin_to_dfu.py` is a standalone tool, so an existing build can be packed without rebuilding it:
 
 ```
 python3 DFU/bin_to_dfu.py "MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.hex" \
@@ -136,7 +140,7 @@ python3 DFU/bin_to_dfu.py "MIDI_Commander_Custom/build/DFU Release/MIDI_Commande
     -a 0x8003000 -o DFU/DFU_OUT/generated.dfu
 ```
 
-Both routes produce the same file. On Windows you can alternatively use `DFU/BuildDFUAutomation.py`, which drives the bundled `DfuFileMgr.exe` through its GUI.
+Both routes produce the same file.
 
 If your `arm-none-eabi-gcc` is not on the `PATH` — for instance if you want to use the copy bundled with STM32CubeIDE — point CMake at it when configuring:
 
