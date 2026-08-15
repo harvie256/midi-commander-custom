@@ -6,6 +6,7 @@ MIDI Commander Studio is a cross-platform local browser application backed by Py
 
 - **macOS:** tested end-to-end with a physical MIDI Commander, including DFU firmware installation, normal-mode MIDI detection, validation, and configuration upload.
 - **Windows 10/11 (64-bit):** launcher and implementation are included and exercised by automated checks, but physical DFU and MIDI upload testing is pending. Treat Windows support as beta.
+- **Linux:** launcher and implementation are included and exercised by automated checks, but physical DFU and MIDI upload testing is pending. Treat Linux support as beta.
 
 ## Normal use on macOS
 
@@ -29,6 +30,14 @@ Use the power button in the top-right corner to stop the local service. If neede
 
 The Firmware page downloads a pinned official 64-bit `dfu-util` build from SourceForge into the ignored `.studio-tools` directory and verifies its SHA-256 checksum before extraction. No third-party executable is committed to this repository. Windows must associate the pedal's DFU-mode `STM32 BOOTLOADER` interface (`0483:df11`) with WinUSB; follow [`docs/WINDOWS.md`](../docs/WINDOWS.md) if the target is not detected.
 
+## Normal use on Linux
+
+Run `./"Launch MIDI Commander Studio.sh"` from the repository root, or double-click it in a file manager that offers **Run**. The launcher creates `.studio-venv-linux`, installs dependencies privately, starts the local service, and opens the browser via `xdg-open`.
+
+`python-rtmidi` is compiled from source when no wheel matches your Python version, which needs `libasound2-dev` and `libjack-jackd2-dev`. Install `dfu-util` from your distribution; unlike Windows, the Firmware page does not download a `dfu-util` build on Linux. DFU installation also needs write access to the `0483:df11` bootloader interface, so run it as root or add a matching udev rule.
+
+Use the power button in the top-right corner to stop the local service, or run `./"Stop MIDI Commander Studio.sh"`.
+
 ## Architecture
 
 - `studio/frontend/src` — React + TypeScript user interface.
@@ -37,6 +46,7 @@ The Firmware page downloads a pinned official 64-bit `dfu-util` build from Sourc
 - `studio/requirements.txt` — isolated runtime dependencies.
 - `Launch MIDI Commander Studio.cmd` / `.ps1` — Windows setup and launcher.
 - `Launch MIDI Commander Studio.command` — macOS setup and launcher.
+- `Launch MIDI Commander Studio.sh` — Linux setup and launcher.
 
 The backend reuses `python/lib/settingsBinaryPacker.py` and `python/lib/cmdBinaryPacker.py`, so packed configurations match the existing firmware format.
 

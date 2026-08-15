@@ -11,9 +11,9 @@ This project provides the following components that work together:
 
 3. The `python/CSV_to_Flash.py` tool that can load a configuration spreadsheet to the Midi Commander through a simple USB connection
 
-# MIDI Commander Studio (macOS and Windows GUI)
+# MIDI Commander Studio (macOS, Windows, and Linux GUI)
 
-This repository now includes **MIDI Commander Studio**, a local visual editor for macOS and Windows. It provides a pedal-style bank and button editor, project autosave, CSV import/export, direct configuration upload, MIDI device diagnostics, and a guarded firmware installation workflow.
+This repository now includes **MIDI Commander Studio**, a local visual editor for macOS, Windows, and Linux. It provides a pedal-style bank and button editor, project autosave, CSV import/export, direct configuration upload, MIDI device diagnostics, and a guarded firmware installation workflow.
 
 ## Purpose
 
@@ -34,6 +34,7 @@ The application runs locally at `http://127.0.0.1:8765`. Project data stays in t
 | --- | --- |
 | macOS | **Tested end-to-end with a physical MIDI Commander:** Studio launch, custom firmware installation, MIDI detection, validation, and configuration upload are working. |
 | Windows 10/11 (64-bit) | Launcher, dependency setup, UI, automated tests, and CI are included. **Physical Windows firmware and MIDI upload testing is still pending**, so Windows support should be treated as beta. |
+| Linux | Launcher, dependency setup, UI, and CI are included. ALSA MIDI ports are enumerated through `python-rtmidi`. **Physical Linux firmware and MIDI upload testing is still pending**, so Linux support should be treated as beta. |
 
 ## Typical workflow
 
@@ -64,6 +65,21 @@ If macOS refuses to open the launcher, Control-click it, choose **Open**, and co
 5. The Studio opens in your default browser at `http://127.0.0.1:8765`.
 
 Windows SmartScreen may show a warning because the open-source launcher is not code-signed. Choose **More info → Run anyway** after confirming that you downloaded the repository from its expected GitHub page. See [`docs/WINDOWS.md`](docs/WINDOWS.md) for firmware-driver setup, troubleshooting, and verification details.
+
+## Start the Studio on Linux
+
+> **Testing status:** Linux hardware testing is pending. Keep a recovery file and use the Linux firmware workflow as beta software until it has been verified with a physical pedal.
+
+1. Install Python 3 with virtual-environment support (`sudo apt install python3 python3-venv` on Debian/Ubuntu).
+2. Install the MIDI build dependencies (`sudo apt install libasound2-dev libjack-jackd2-dev`). These are only needed when `python-rtmidi` has no prebuilt wheel for your Python version and must be compiled.
+3. For the firmware workflow, install `dfu-util` (`sudo apt install dfu-util`); the Studio does not download it automatically on Linux.
+4. Run `./"Launch MIDI Commander Studio.sh"` from a terminal, or double-click it in your file manager and choose **Run**.
+5. On the first launch, allow a minute for the private Python environment to be prepared. Later launches are immediate.
+6. The Studio opens in your default browser at `http://127.0.0.1:8765`.
+
+Stop the local service with the power button in the top-right corner, or run `./"Stop MIDI Commander Studio.sh"`.
+
+Installing firmware over DFU needs write access to the USB device. Either run the DFU step as root or add a udev rule for the pedal's bootloader (`0483:df11`) so it is writable by your user.
 
 Use the **Editor** to design banks and commands, **Device** to upload a configuration while the pedal is in normal mode, and **Firmware** only when installing the bundled custom firmware in DFU mode. The Studio automatically creates repository-compatible CSV files, so the command-line workflow remains available.
 
