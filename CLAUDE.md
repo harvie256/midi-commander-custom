@@ -43,8 +43,10 @@ arm-none-eabi-objdump -d "build/DFU Release/MIDI_Commander_Custom.elf" --disasse
 
 The disassembly must store `0x08003000` to `0xE000ED08`; in a `Debug` build `SystemInit` is a no-op.
 
+**Packing a `.dfu`:** `python3 DFU/bin_to_dfu.py <build.hex> -o out.dfu` — pure Python, no ST tools needed. A `.hex` carries its own load address; a `.bin` needs `-a 0x8003000`. Output is byte-identical to `DfuFileMgr.exe` apart from the 255-byte target-name field, where ST's tool emits uninitialised heap past `"ST..."` and this writes zero padding. `DFU/BuildDFUAutomation.py` (Windows, `pywinauto`, drives `DfuFileMgr.exe` through its GUI) does the same job and is now redundant.
+
 **Flashing a build:**
-- Windows: `python DFU/BuildDFUAutomation.py` (needs `pywinauto`; drives `DfuFileMgr.exe` through its GUI, consumes the `.hex`), then `DFU/DownloadToMidiCommandByDFU.bat`.
+- Windows: `DFU/DownloadToMidiCommandByDFU.bat`, which runs the bundled `DfuSeCommand.exe` against the newest file in `DFU/DFU_OUT/`.
 - macOS/Linux: `dfu-util --alt 0 -s 0x8003000 --download "MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin"` — pass the load address explicitly since `dfu-util` can't build a `.dfu`.
 - Device enters DFU mode by holding `bank down` + `D` while pressing power.
 

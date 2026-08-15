@@ -118,7 +118,25 @@ cmake --build --preset "DFU Release"
 
 There are two build presets. `DFU Release` is the one to flash through the DFU bootloader: it is optimised, linked at `0x8003000` with the offset linker script, and relocates the vector table to match. `Debug` is unoptimised and linked at the start of flash for use with an ST-Link debugger.
 
-Each build writes `MIDI_Commander_Custom.elf`, `.hex`, and `.bin` into `build/<preset name>/`. To make a DFU file for upload, use the DFU packing tool that comes with the DFU uploader. Using the Intel HEX format file instead of the .bin saves you having to input the flash offset.
+Each build writes `MIDI_Commander_Custom.elf`, `.hex`, and `.bin` into `build/<preset name>/`.
+
+## Building a DFU file
+
+`DFU/bin_to_dfu.py` packs a build into the `.dfu` package that the ST upload tools expect. It needs nothing but Python and runs on any platform:
+
+```
+python3 DFU/bin_to_dfu.py "MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.hex" \
+    -o DFU/DFU_OUT/generated.dfu
+```
+
+Giving it the Intel HEX file saves you having to state the flash offset, since the address is already recorded in the file. To pack a raw binary instead, name the load address explicitly:
+
+```
+python3 DFU/bin_to_dfu.py "MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin" \
+    -a 0x8003000 -o DFU/DFU_OUT/generated.dfu
+```
+
+Both routes produce the same file. On Windows you can alternatively use `DFU/BuildDFUAutomation.py`, which drives the bundled `DfuFileMgr.exe` through its GUI.
 
 If your `arm-none-eabi-gcc` is not on the `PATH` — for instance if you want to use the copy bundled with STM32CubeIDE — point CMake at it when configuring:
 
@@ -150,11 +168,13 @@ If you have a DFU file (e.g. from `DFU/DFU_OUT/generated-*.dfu`), you can load i
 dfu-util --alt 0 --download ./DFU/DFU_OUT/generated-*.dfu
 ```
 
-If you are building the firmware yourself on macOS, it is unclear how you can create a DFU file. Instead you should use a binary file and specify the load address explicitly. To do that, build the `DFU Release` preset and load the `.bin` it produces as follows:
+If you are building the firmware yourself, you can skip the `.dfu` packaging altogether and load the binary directly, naming the load address explicitly:
 
 ```
 dfu-util --alt 0 -s 0x8003000 --download "./MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin"
 ```
+
+If you would rather produce a `.dfu` — to share a build with someone else, for instance — see [Building a DFU file](#building-a-dfu-file) above.
 
 Once the firmware is loaded, turn off the device and turn it back on in normal mode. You should see the name and version of the custom firmware on the display briefly, and then the name of the first configured bank. You can now load your own configuration following the instructions in the section [Configuration](#configuration).
 
