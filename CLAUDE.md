@@ -47,10 +47,11 @@ The disassembly must store `0x08003000` to `0xE000ED08`; in a `Debug` build `Sys
 
 Only the DFU variant gets packed, deliberately — a `Debug` build is linked at `0x8000000`, so a `.dfu` of it would overwrite the bootloader if uploaded.
 
-**Flashing a build:**
+**Flashing a build:** `dfu-util` is the single supported path on all three operating systems.
+
 - `dfu-util --alt 0 -s 0x8003000 --download "MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin"` — the `.bin` needs the address named explicitly; the `.dfu` carries it, so `dfu-util --alt 0 --download <file.dfu>` also works.
 - Device enters DFU mode by holding `bank down` + `D` while pressing power.
-- The vendored ST Windows tools under `DFU/MidiCommander_DFU_APP/` (DfuSeDemo, drivers) are kept for Windows users flashing by hand; nothing in the repo drives them any more.
+- `DFU/MidiCommander_DFU_APP/` holds ST's DfuSe tools and Windows drivers. Nothing in the repo drives them; they are retained only because returning to stock MeloAudio firmware needs a DfuSe-based updater, and on Windows that means switching the USB driver back from the WinUSB one that dfu-util requires. Don't reintroduce them into any build or flash workflow.
 
 **Python tooling:**
 

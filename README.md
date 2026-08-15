@@ -17,9 +17,7 @@ There is the current build under `DFU\DFU_OUT\generated_xxx.dfu`. See the instru
 
 Anything I leave in there has had a bit of testing on my device, and everything appears to be working ok.  These are still Dev builds, so it's likely they'll have bugs.  But it's something you can play with, and you should be able to go back to an meloaudio build.
 
-Uploading the DFU binary is the same as for the meloaudio firmware.  So download the firmware update tools from the meloaudio website (or directly from ST - package STSW-STM32080) and follow the upgrade manual.
-
-I have had a lot of issues under Windows 10, and there are reports from others on the net to this effect. So I'm using a Windows 7 Virtual Machine to test the DFU aspects, which works fine.
+The DFU binary is uploaded with `dfu-util`, on any operating system — see [Loading the firmware](#loading-the-firmware). Note that earlier versions of these instructions used MeloAudio's updater and ST's DfuSe tools, which gave a lot of trouble under Windows 10; `dfu-util` is now the supported route and those tools are only needed for [going back to the MeloAudio firmware](#going-back-to-the-meloaudio-firmware).
 
 # Improvements in this commit
 24 Apr 22 - The display driver has been modified to use DMA for all transfers, and interrupts to kick off the transfer of each line.  The result is the processor isn't stalled waiting for the display to update. This will allow the display to be utilised more on individual key presses without resulting in delays.  From an end user perspective, there should be no visable change.
@@ -150,9 +148,13 @@ cmake --preset "DFU Release" -DTOOLCHAIN_PREFIX=/path/to/toolchain/bin/
 
 ## Loading the firmware
 
-### macOS
+The firmware is loaded with [dfu-util](https://dfu-util.sourceforge.net/), which works the same way on Linux, macOS and Windows:
 
-On macOS the firmware can be loaded with [dfu-util](https://dfu-util.sourceforge.net/) which can be installed using [Homebrew](https://brew.sh/) with a simple `brew install dfu-util`.
+| | |
+|---|---|
+| Linux | `sudo apt install dfu-util` (or your distribution's equivalent) |
+| macOS | `brew install dfu-util` using [Homebrew](https://brew.sh/) |
+| Windows | Download the binaries from the [dfu-util site](https://dfu-util.sourceforge.net/), then use [Zadig](https://zadig.akeo.ie/) to assign the WinUSB driver to the device while it is in DFU mode |
 
 Then you connect the Midi Commander to the USB port of the computer and start it in DFU mode by holding down the `bank down` and `D` buttons (the two buttons on the bottom-right corner) while pressing the power button. The device should start with nothing on the display, and the LED 3 turned on.
 
@@ -178,9 +180,15 @@ If you are building the firmware yourself, you can skip the `.dfu` packaging alt
 dfu-util --alt 0 -s 0x8003000 --download "./MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin"
 ```
 
-If you would rather produce a `.dfu` — to share a build with someone else, for instance — see [Building a DFU file](#building-a-dfu-file) above.
+If you would rather produce a `.dfu` — to share a build with someone else, for instance — see [Packing a DFU file by hand](#packing-a-dfu-file-by-hand) above.
 
 Once the firmware is loaded, turn off the device and turn it back on in normal mode. You should see the name and version of the custom firmware on the display briefly, and then the name of the first configured bank. You can now load your own configuration following the instructions in the section [Configuration](#configuration).
+
+### Going back to the MeloAudio firmware
+
+The stock firmware is loaded with MeloAudio's own updater, which is built on ST's DfuSe tools rather than dfu-util. On Windows those two want different USB drivers, so if you used Zadig to switch the device to WinUSB you will need to point the driver back at ST's before the MeloAudio updater will see it. A copy of the ST tools and their drivers is kept in this repository under `DFU/MidiCommander_DFU_APP/`, and they are also available from ST as package STSW-STM32080. Nothing in this project uses them otherwise.
+
+Your MeloAudio configuration is not affected by any of this: the custom firmware keeps its settings in the microcontroller's own flash memory, and never touches the external EEPROM that the stock firmware stores its configuration in.
 
 ## Python development
 Python files under `python/` can be edited directly, however it is recommended to use the VS Code workspace at the root of this repository with the recommended extensions. It is configured to use auto-formatting with Black and type checking with MyPy.
