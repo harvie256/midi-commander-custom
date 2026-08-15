@@ -102,9 +102,29 @@ Once your Python environment is operational, you can load your configuration ont
 The tool will convert the CSV file to a binary format and transmit it to the Midi Commander. At the end of the operation the Midi Commander should restart to load the new configuration.
 
 # Basic instructions for setting up development environment
-Other than the simple python scripts, it's all just [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html). Install that, import the project from the `MIDI_Commander_Custom` directory into your workspace (it's just shrink wrapped Eclipse) and you're done.
+Other than the simple python scripts, the firmware is a CMake project. You need CMake (3.22 or later), a build tool such as Ninja, and the `arm-none-eabi` GCC toolchain. On Debian/Ubuntu:
 
-There are two Build target, one called `DFU Release` for the DFU (with offset linker script and vector table) and the other called `Debug` for use with a ST-Link debugger. To build a DFU file for upload you'll need to build the binary in the IDE, then use the DFU packing tool that comes with the DFU uploader (can't remember their exact names off the top of my head.) Using the Intel HEX format file instead of the .bin saves you having to input the flash offset.
+```
+sudo apt install cmake ninja-build gcc-arm-none-eabi binutils-arm-none-eabi
+```
+
+In VS Code, install the [STM32 VS Code Extension](https://marketplace.visualstudio.com/items?itemName=STMicroelectronics.stm32-vscode-extension) and open the `MIDI_Commander_Custom` folder. The build configurations are picked up from `CMakePresets.json`. Alternatively, build from the command line:
+
+```
+cd MIDI_Commander_Custom
+cmake --preset "DFU Release"
+cmake --build --preset "DFU Release"
+```
+
+There are two build presets. `DFU Release` is the one to flash through the DFU bootloader: it is optimised, linked at `0x8003000` with the offset linker script, and relocates the vector table to match. `Debug` is unoptimised and linked at the start of flash for use with an ST-Link debugger.
+
+Each build writes `MIDI_Commander_Custom.elf`, `.hex`, and `.bin` into `build/<preset name>/`. To make a DFU file for upload, use the DFU packing tool that comes with the DFU uploader. Using the Intel HEX format file instead of the .bin saves you having to input the flash offset.
+
+If your `arm-none-eabi-gcc` is not on the `PATH` — for instance if you want to use the copy bundled with STM32CubeIDE — point CMake at it when configuring:
+
+```
+cmake --preset "DFU Release" -DTOOLCHAIN_PREFIX=/path/to/toolchain/bin/
+```
 
 ## Loading the firmware
 
@@ -130,10 +150,10 @@ If you have a DFU file (e.g. from `DFU/DFU_OUT/generated-*.dfu`), you can load i
 dfu-util --alt 0 --download ./DFU/DFU_OUT/generated-*.dfu
 ```
 
-If you are building the firmware yourself on macOS, it is unclear how you can create a DFU file. Instead you should use a binary file and specify the load address explicitly. To do that, use the `DFU Release` build target in STM32CubeIDE to produce a `.bin` binary file that you can load as follows:
+If you are building the firmware yourself on macOS, it is unclear how you can create a DFU file. Instead you should use a binary file and specify the load address explicitly. To do that, build the `DFU Release` preset and load the `.bin` it produces as follows:
 
 ```
-dfu-util --alt 0 -s 0x8003000 --download "./MIDI_Commander_Custom/DFU Release/MIDI_Commander_Custom.bin"
+dfu-util --alt 0 -s 0x8003000 --download "./MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin"
 ```
 
 Once the firmware is loaded, turn off the device and turn it back on in normal mode. You should see the name and version of the custom firmware on the display briefly, and then the name of the first configured bank. You can now load your own configuration following the instructions in the section [Configuration](#configuration).

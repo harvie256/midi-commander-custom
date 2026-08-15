@@ -14,18 +14,38 @@ There is no test suite anywhere in the repo. Verification is done on hardware.
 
 ## Building
 
-**Firmware:** STM32CubeIDE only — there is no Makefile or CMakeLists. Import `MIDI_Commander_Custom/` as an existing project. Two build configurations:
+**Firmware:** CMake + `arm-none-eabi-gcc`, driven by `MIDI_Commander_Custom/CMakePresets.json`. Two presets, matching the STM32CubeIDE configurations this replaced:
 
-| Config | Linker script | Flash origin | Use |
-|---|---|---|---|
-| `Debug` | `STM32F103RETX_FLASH.ld` | `0x8000000` | ST-Link debugging via SWD (see `HardwareNotes.txt` for the P3 pinout) |
-| `DFU Release` | `STM32F103RETX_FLASH_DFU.ld` | `0x8003000` | Loading over the stock ST DFU bootloader |
+| Preset | `CMAKE_BUILD_TYPE` | Linker script | Flash origin | Use |
+|---|---|---|---|---|
+| `Debug` | Debug (`-O0`) | `STM32F103RETX_FLASH.ld` | `0x8000000` | ST-Link debugging via SWD (see `HardwareNotes.txt` for the P3 pinout) |
+| `DFU Release` | Release (`-O2`) | `STM32F103RETX_FLASH_DFU.ld` | `0x8003000` | Loading over the stock ST DFU bootloader |
 
-The DFU offset lives in **two** places that must move together: `ORIGIN` in `STM32F103RETX_FLASH_DFU.ld` and `VECT_TAB_OFFSET` (`0x3000`) in `Core/Src/system_stm32f1xx.c`. `DFU Release` emits `.hex`, `.bin`, and `.elf`.
+```
+cd MIDI_Commander_Custom
+cmake --preset "DFU Release" && cmake --build --preset "DFU Release"
+```
+
+Output lands in `build/<preset>/` as `.elf`, `.hex` (consumed by `DFU/BuildDFUAutomation.py`), and `.bin` (consumed by `dfu-util`). `-DTOOLCHAIN_PREFIX=/path/to/bin/` selects a compiler that isn't on `PATH`.
+
+The DFU offset lives in **three** places that must move together, and the third is easy to miss:
+
+1. `ORIGIN` in `STM32F103RETX_FLASH_DFU.ld`
+2. `VECT_TAB_OFFSET` (`0x3000`) in `Core/Src/system_stm32f1xx.c`
+3. **`-DUSER_VECT_TAB_ADDRESS`** — the `#if` guard around (2). It is never defined in source; it comes from the build config, so `SystemInit()` only writes `SCB->VTOR` when it is set
+
+`CMakeLists.txt` therefore sets the linker script and that define together under a single `DFU_BOOTLOADER_OFFSET` option — keep it that way. Setting one without the other yields firmware that flashes and boots but faults on the first interrupt. To verify a DFU build is correct without hardware:
+
+```
+arm-none-eabi-readelf -S "build/DFU Release/MIDI_Commander_Custom.elf" | grep isr_vector   # 08003000
+arm-none-eabi-objdump -d "build/DFU Release/MIDI_Commander_Custom.elf" --disassemble=SystemInit
+```
+
+The disassembly must store `0x08003000` to `0xE000ED08`; in a `Debug` build `SystemInit` is a no-op.
 
 **Flashing a build:**
 - Windows: `python DFU/BuildDFUAutomation.py` (needs `pywinauto`; drives `DfuFileMgr.exe` through its GUI, consumes the `.hex`), then `DFU/DownloadToMidiCommandByDFU.bat`.
-- macOS/Linux: `dfu-util --alt 0 -s 0x8003000 --download "MIDI_Commander_Custom/DFU Release/MIDI_Commander_Custom.bin"` — pass the load address explicitly since `dfu-util` can't build a `.dfu`.
+- macOS/Linux: `dfu-util --alt 0 -s 0x8003000 --download "MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin"` — pass the load address explicitly since `dfu-util` can't build a `.dfu`.
 - Device enters DFU mode by holding `bank down` + `D` while pressing power.
 
 **Python tooling:**
@@ -92,7 +112,11 @@ Every send in `midi_cmds.c` fans out to both transports, which have different bu
 
 ## CubeMX-generated code
 
-`MIDI_Commander_Custom.ioc` regenerates `main.c`, `stm32f1xx_it.c`, `stm32f1xx_hal_msp.c`, and the USB_DEVICE files. Regenerating overwrites everything outside `/* USER CODE BEGIN X */ ... /* USER CODE END X */` markers. Hand edits that live *outside* those markers and would be lost:
+`MIDI_Commander_Custom.ioc` regenerates `main.c`, `stm32f1xx_it.c`, `stm32f1xx_hal_msp.c`, and the USB_DEVICE files. Regenerating overwrites everything outside `/* USER CODE BEGIN X */ ... /* USER CODE END X */` markers.
+
+It still carries `ProjectManager.TargetToolchain=STM32CubeIDE`, so a regeneration would re-emit the `.cproject`/`.project` files that the CMake conversion removed. Switching it to CMake generation is a deliberate, untested change — CubeMX knows nothing about the vendored ssd1306 fork or the custom USB MIDI class, so its `CMakeLists.txt` would not be a drop-in replacement for the hand-written one.
+
+Hand edits that live *outside* the USER CODE markers and would be lost to a regeneration:
 
 - `VECT_TAB_OFFSET` in `system_stm32f1xx.c`
 - The MIDI class (`Middlewares/ST/STM32_USB_Device_Library/Class/MIDI/`) — CubeMX only knows about the AUDIO class this was derived from

@@ -1,0 +1,45 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "toolchainFile": "${sourceDir}/cmake/gcc-arm-none-eabi.cmake",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "Debug",
+            "displayName": "Debug (SWD, 0x8000000)",
+            "description": "Unoptimised build linked at the start of flash, for ST-Link debugging",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "DFU_BOOTLOADER_OFFSET": "OFF"
+            }
+        },
+        {
+            "name": "DFU Release",
+            "displayName": "DFU Release (0x8003000)",
+            "description": "Optimised build linked behind the DFU bootloader, with the vector table relocated to match",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "DFU_BOOTLOADER_OFFSET": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "Debug",
+            "configurePreset": "Debug"
+        },
+        {
+            "name": "DFU Release",
+            "configurePreset": "DFU Release"
+        }
+    ]
+}

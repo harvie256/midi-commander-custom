@@ -15,7 +15,7 @@ import os
 # Create file paths relative to the repo
 BASE_PATH = Path(os.path.realpath(__file__)).parent.parent.absolute()
 DFU_FILE_MGR_PATH = BASE_PATH.joinpath(r"DFU\MidiCommander_DFU_APP\DfuFileMgr.exe").__str__()
-HEX_FILE_PATH = BASE_PATH.joinpath(r"MIDI_Commander_Custom\DFU Release\MIDI_Commander_Custom.hex").__str__()
+HEX_FILE_PATH = BASE_PATH.joinpath(r"MIDI_Commander_Custom\build\DFU Release\MIDI_Commander_Custom.hex").__str__()
 DFU_OUTPUT_PATH = BASE_PATH.joinpath(r'DFU\DFU_OUT\generated-{}.dfu'.format(time.strftime("%Y%m%d-%H%M%S"))).__str__()
 
 print('Base Path: ', BASE_PATH)
