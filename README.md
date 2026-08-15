@@ -68,7 +68,9 @@ Roughly, the spreadsheet allows you to specify for each button press up to 10 in
 - Note velocity
 - Note/PB duration (up to 2.5 seconds in 10ms increments)
 
-Lines starting with `#` or `*` are simply ignored which allows you to include comments in the configuration file to keep track of your work.
+Any line containing a `#` is discarded, which allows you to include comments in the configuration file to keep track of your work. Note that the `#` does not have to be at the start of the line: a `#` anywhere in a row (including inside a bank name or other cell value) causes the whole line to be dropped, so avoid using it in your configuration data.
+
+Lines containing a `*` are section titles that mark the start of each configuration table (`Global_Settings`, `Bank_Naming`, `Button_Settings`), so `*` cannot be used for comments either.
 
 Once you are happy with your configuration, download it from Google Sheets as a CSV file (or use "Save As" if you chose to edit it locally with Excel or similar spreadsheet software).
 
