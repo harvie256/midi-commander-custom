@@ -4,13 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Replacement firmware for the MeloAudio MIDI Commander (a MIDI foot controller), plus the host-side tooling to configure it. Three pieces that must stay in sync:
+Replacement firmware for the MeloAudio MIDI Commander (a MIDI foot controller), plus the host-side tooling to configure it. Four pieces that must stay in sync:
 
-1. **Firmware** — `MIDI_Commander_Custom/`, an STM32CubeIDE project for an STM32F103RET (256 KiB+ flash, 12 MHz crystal, SSD1306 OLED on I2C1 @0x3C, MIDI DIN out on USART2).
+1. **Firmware** — `MIDI_Commander_Custom/`, a CMake project for an STM32F103RET (256 KiB+ flash, 12 MHz crystal, SSD1306 OLED on I2C1 @0x3C, MIDI DIN out on USART2). Still carries a CubeMX `.ioc`.
 2. **Config tool** — `python/CSV_to_Flash.py`, packs a CSV config into the firmware's binary layout and pushes it over USB MIDI SysEx.
 3. **DFU packaging** — `DFU/bin_to_dfu.py` wraps a build into a `.dfu`; `DFU/MidiCommander_DFU_APP/` holds the vendored ST Windows tools and drivers.
+4. **MIDI Commander Studio** — `studio/`, a local-only GUI (FastAPI backend + React frontend, opened in the browser) that wraps 2 and 3 for people who don't want a CSV and a terminal. Launched by the `Launch MIDI Commander Studio.*` scripts at the repo root.
 
-There is no test suite anywhere in the repo. Verification is done on hardware.
+The firmware and the CLI tooling have no tests; verification is on hardware. Studio's backend has pytest coverage under `studio/backend/tests/`, and `.github/workflows/studio.yml` runs it plus a frontend type-check and build on all three OSes — but **only** on changes under `studio/`, `python/`, and the launcher scripts. Nothing in CI builds the firmware.
 
 ## Building
 
@@ -62,6 +63,30 @@ python3 python/CSV_to_Flash.py <config.csv>
 
 On Linux, `python-rtmidi` needs `libjack-dev` and `libasound2-dev` first — see `python/linux-prerequisites.sh`. Python is formatted with Black and type-checked with mypy in basic mode (`.vscode/`); mido's dynamic symbols require `# type: ignore` on its call sites.
 
+**Studio:** the launcher scripts are the supported entry point — they create the venv, install `studio/requirements.txt`, start the backend detached, and open the browser at `http://127.0.0.1:8765`. Each OS gets its own venv directory (`.studio-venv` on macOS, `.studio-venv-linux`, `.studio-venv-windows`) because a venv is not portable across platforms; all three are gitignored, along with `.studio-runtime/` (logs and the server PID) and `.studio-tools/`.
+
+To work on it directly:
+
+```
+python3 -m venv .studio-venv-linux
+.studio-venv-linux/bin/python -m pip install -r studio/requirements.txt pytest
+.studio-venv-linux/bin/python -m studio.backend.app     # run from the repo root; --host/--port to override
+.studio-venv-linux/bin/python -m pytest -q studio/backend/tests
+```
+
+The backend must be started from the repo root — it is a package (`studio.backend.app`), and `config_service.py`/`device_service.py` resolve `REPO_ROOT` by walking up two parents to reach `python/lib/` and `DFU/`.
+
+Frontend work needs Node:
+
+```
+cd studio/frontend && npm ci
+npm run dev      # Vite on 127.0.0.1:5173, proxying /api to the backend on 8765
+npm run lint     # tsc --noEmit over both tsconfigs; `build` runs the same check first
+npm run build
+```
+
+**`studio/frontend/dist/` is committed on purpose.** `app.py` mounts it as static files and serves `index.html` as a catch-all, and no launcher runs `npm` — an end user gets the GUI with Python alone. So a frontend source change is not live until you rebuild *and commit the rebuilt `dist/`*. Two consequences: the bundle hashes in `dist/assets/` churn on every build, and a source edit without a rebuild silently does nothing.
+
 ## Architecture
 
 ### Firmware control flow
@@ -94,11 +119,15 @@ The 4-byte per-command encoding is **written** by `python/lib/cmdBinaryPacker.py
 - `GLOBAL_SETTINGS_*` indices — `midi_defines.h` ↔ `settingsBinaryPacker.py`
 - `FLASH_SETTINGS_NO_PAGES` ↔ `ALLOWED_NUM_FLASH_PAGES` in `CSV_to_Flash.py` (the tool only warns on overflow)
 
+Studio does **not** add a fourth encoder — `studio/backend/config_service.py` imports the same two packers (via a `sys.path` insert of `python/`) and feeds them pandas DataFrames shaped exactly like the ones `CSV_to_Flash.py` builds from a CSV. So the packers stay the single source of truth, but their *input column names* are now a contract too: `COMMAND_FIELDS` in `config_service.py` must match the `A_`…`J_` column suffixes `cmdBinaryPacker.pack_row()` reads.
+
 Encoding conventions worth knowing: byte 0 is command nibble | channel; the toggle flag is the top bit of byte 1; the "no value" sentinel is `0x80` (used to suppress bank-select bytes in PC commands and the off-value in CC); note/PB duration is byte 3 in 10 ms units.
 
 ### Config transfer protocol (USB SysEx)
 
-`USB_DEVICE/App/usbd_midi_if.c` implements the device side; `CSV_to_Flash.py` the host side. Private-use manufacturer ID `0x7D`. Erase (52) requires the check words `0x42 0x24` and replies 53; write (54) carries a 16-byte-page address as two 7-bit bytes followed by 16 bytes split into 32 nibbles, and replies 55; reset (60) calls `NVIC_SystemReset()`. The host waits for each reply before sending the next chunk. Nibble-splitting exists because SysEx data bytes must stay under 0x80.
+`USB_DEVICE/App/usbd_midi_if.c` implements the device side. There are **two** host-side implementations: `CSV_to_Flash.py` and `studio/backend/device_service.py`, which re-declares the same opcodes (`ERASE_FLASH = 52`, `WRITE_FLASH = 54`, `RESET = 60`, …) rather than importing them. A protocol change needs editing all three.
+
+Private-use manufacturer ID `0x7D`. Erase (52) requires the check words `0x42 0x24` and replies 53; write (54) carries a 16-byte-page address as two 7-bit bytes followed by 16 bytes split into 32 nibbles, and replies 55; reset (60) calls `NVIC_SystemReset()`. The host waits for each reply before sending the next chunk. Nibble-splitting exists because SysEx data bytes must stay under 0x80.
 
 The same file also handles realtime passthrough: USB clock/start/stop bytes are forwarded to the serial port when `GLOBAL_SETTINGS_REALTIME_PASS` is set.
 
@@ -114,6 +143,28 @@ Every send in `midi_cmds.c` fans out to both transports, which have different bu
 ### Display
 
 `Middlewares/stm32-ssd1306-master/` is a **vendored and modified** fork of afiskon/stm32-ssd1306. The modification is the point: screen updates are pushed one page at a time by `ssd1306_tick()` from SysTick, each page a single `HAL_I2C_Mem_Write_DMA` that carries the page/column commands and the pixel data together. Do not replace it with upstream — the DMA/tick machinery would be lost.
+
+### MIDI Commander Studio
+
+A localhost web app, not a desktop app: `studio/backend/app.py` is a FastAPI server bound to `127.0.0.1:8765` that serves both the JSON API and the prebuilt React bundle, and the launcher just opens a browser at it. There is no authentication and no CORS — binding to loopback *is* the security model, so don't add a `--host 0.0.0.0` default or widen it casually. `POST /api/shutdown` calls `os._exit(0)` behind a 0.4 s timer (so the HTTP response gets flushed first); that is what the `Stop MIDI Commander Studio.*` scripts and the UI's quit button hit.
+
+Route order matters in `app.py`: the static-file mount and the `@app.get("/{full_path:path}")` catch-all that serves `index.html` are registered *after* every API route, at the bottom of the module. A new endpoint declared below them is shadowed by the catch-all and returns HTML.
+
+**Three pages, three backends:**
+
+- **Editor** (`config_service.py`) — pure data. Import/export the CSV format, validate, and pack. `validate_project()` returns a flat list of `{level, path, message}`; `error` blocks packing and upload, `warning` does not. It is the only place the firmware's field limits are enforced host-side (16-char config name, 4/8-char bank names, 8 banks × 8 buttons × ≤10 commands, channel 1–16, duration a multiple of 10 ms up to 1270).
+- **Device** (`device_service.py`) — MIDI. Scans ports via mido and calls anything with `STM` in the name compatible; uploads over the SysEx protocol above; `test_command()` sends a single command live for audition, expanding one stored command into the MIDI messages the firmware would emit.
+- **Firmware** (`device_service.py`) — DFU. Checks for `dfu-util`, can fetch it on Windows (pinned SourceForge URL, SHA-256 verified before extraction) or `brew install` it on macOS, and shells out to install firmware. Linux is deliberately manual — install `dfu-util` from your distro.
+
+**Studio installs the committed `DFU/DFU_OUT/generated-20220424-163714.dfu`, not your CMake build.** `FIRMWARE_PATH` is hardcoded to that prebuilt file; nothing wires `build/DFU Release/MIDI_Commander_Custom.dfu` into the GUI. If you change the firmware and want Studio to install it, that path is what you have to point at. The `--device 0483:0000,0483:df11` argument in `_firmware_install_command()` is deliberate and commented — the bundled file's DfuSe suffix records the runtime ID while the bootloader enumerates as `df11`, and naming both avoids disabling suffix validation with a force flag.
+
+**Long operations are jobs.** Uploading, installing `dfu-util`, and installing firmware all return a `jobId` immediately and run on a daemon thread (`jobs.py`); the frontend's `useJob` hook polls `GET /api/jobs/{id}` every 500 ms until `completed`/`failed`. The store is a plain in-memory dict with no eviction — jobs die with the process, which is fine for a single-user local tool. Backend code inside a job reports by calling `job.log()`/setting `job.progress`; raising is how you fail it, and the exception message is what the user sees.
+
+**Project state lives in the browser.** `useStudioProject` keeps the whole project in `localStorage` under `midi-commander-studio:project:v1`, debounced 250 ms, and revalidates against the server 180 ms after every edit. The server holds no project state at all — every endpoint takes the full `StudioProject` in the request body. Clearing site data loses unsaved work; that's why the UI offers CSV export and a `.mcs.json` project file (the latter is just the serialised `StudioProject`, saved and reloaded entirely client-side — there is no endpoint for it).
+
+`models.py` is the schema shared across all of it: pydantic models on the backend, hand-mirrored in `studio/frontend/src/types.ts`. They are not generated from each other, so a field added to one must be added to the other.
+
+Two encoding quirks that must round-trip through the CSV: a suppressed CC off-value is written as `255` in the CSV but is `suppressOff: true` in the model (`0x80` on the wire), and `durationMs` is milliseconds in the model but 10 ms units in the CSV column. `upload_configuration()` also refuses to run unless the packed result is exactly 2688 bytes — a literal, not derived from `FLASH_SETTINGS_NO_PAGES`, so a flash-layout change has to update it too.
 
 ## CubeMX-generated code
 
@@ -131,3 +182,5 @@ Pin names (`SW_1_Pin`, `LED_A_GPIO_Port`, …) come from the `.ioc` and are the 
 ## Configuration CSV format
 
 The template is a Google Sheet (linked in `README.md`); `python/MeloConfig_10_Cmds - RC-600.csv` is a checked-in copy. The parser splits the file into sections on lines containing `*` — `Global_Settings`, `Bank_Naming`, `Button_Settings` — and each becomes a pandas DataFrame. Per-command columns are prefixed `A_` through `J_` for the 10 commands. Note that comment stripping drops any line *containing* `#`, not just lines starting with it.
+
+There are two parsers for this format and they are not identical. `CSV_to_Flash.py` uses pandas and the `#`-anywhere rule above; Studio's `_read_sections()` in `config_service.py` uses the `csv` module and only skips rows whose *first cell* starts with `#`. Studio is also lenient where the CLI is not — it ignores unknown command types, rows with an out-of-range bank number, and missing columns, filling defaults instead of failing. A CSV that imports cleanly into Studio is therefore not proof that `CSV_to_Flash.py` will accept it, and vice versa. Studio's exporter writes the same section layout with a `# Generated by MIDI Commander Studio` header line.
