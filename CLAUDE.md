@@ -158,6 +158,8 @@ Every send in `midi_cmds.c` fans out to both transports, which have different bu
 
 ### MIDI Commander Studio
 
+[`PACKAGING-OPTIONS.md`](PACKAGING-OPTIONS.md) records two candidate directions for replacing the launcher-plus-browser delivery model (a Tauri desktop app, or a static web app using Web MIDI/WebUSB). Exploratory — nothing there is decided, but read it before proposing a third.
+
 A localhost web app, not a desktop app: `studio/backend/app.py` is a FastAPI server bound to `127.0.0.1:8765` that serves both the JSON API and the prebuilt React bundle, and the launcher just opens a browser at it. There is no authentication and no CORS — binding to loopback *is* the security model, so don't add a `--host 0.0.0.0` default or widen it casually. `POST /api/shutdown` calls `os._exit(0)` behind a 0.4 s timer (so the HTTP response gets flushed first); that is what the `Stop MIDI Commander Studio.*` scripts and the UI's quit button hit.
 
 Route order matters in `app.py`: the static-file mount and the `@app.get("/{full_path:path}")` catch-all that serves `index.html` are registered *after* every API route, at the bottom of the module. A new endpoint declared below them is shadowed by the catch-all and returns HTML.
