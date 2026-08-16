@@ -91,9 +91,7 @@ There is the current build under `DFU\DFU_OUT\generated_xxx.dfu`. See the instru
 
 Anything I leave in there has had a bit of testing on my device, and everything appears to be working ok.  These are still Dev builds, so it's likely they'll have bugs.  But it's something you can play with, and you should be able to go back to an meloaudio build.
 
-Uploading the DFU binary is the same as for the meloaudio firmware.  So download the firmware update tools from the meloaudio website (or directly from ST - package STSW-STM32080) and follow the upgrade manual.
-
-I have had a lot of issues under Windows 10, and there are reports from others on the net to this effect. So I'm using a Windows 7 Virtual Machine to test the DFU aspects, which works fine.
+The DFU binary is uploaded with `dfu-util`, on any operating system — see [Loading the firmware](#loading-the-firmware). Note that earlier versions of these instructions used MeloAudio's updater and ST's DfuSe tools, which gave a lot of trouble under Windows 10; `dfu-util` is now the supported route and those tools are only needed for [going back to the MeloAudio firmware](#going-back-to-the-meloaudio-firmware).
 
 # Improvements in this commit
 24 Apr 22 - The display driver has been modified to use DMA for all transfers, and interrupts to kick off the transfer of each line.  The result is the processor isn't stalled waiting for the display to update. This will allow the display to be utilised more on individual key presses without resulting in delays.  From an end user perspective, there should be no visable change.
@@ -142,7 +140,9 @@ Roughly, the spreadsheet allows you to specify for each button press up to 10 in
 - Note velocity
 - Note/PB duration (up to 2.5 seconds in 10ms increments)
 
-Lines starting with `#` or `*` are simply ignored which allows you to include comments in the configuration file to keep track of your work.
+Any line containing a `#` is discarded, which allows you to include comments in the configuration file to keep track of your work. Note that the `#` does not have to be at the start of the line: a `#` anywhere in a row (including inside a bank name or other cell value) causes the whole line to be dropped, so avoid using it in your configuration data.
+
+Lines containing a `*` are section titles that mark the start of each configuration table (`Global_Settings`, `Bank_Naming`, `Button_Settings`), so `*` cannot be used for comments either.
 
 Once you are happy with your configuration, download it from Google Sheets as a CSV file (or use "Save As" if you chose to edit it locally with Excel or similar spreadsheet software).
 
@@ -174,15 +174,61 @@ Once your Python environment is operational, you can load your configuration ont
 The tool will convert the CSV file to a binary format and transmit it to the Midi Commander. At the end of the operation the Midi Commander should restart to load the new configuration.
 
 # Basic instructions for setting up development environment
-Other than the simple python scripts, it's all just [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html). Install that, import the project from the `MIDI_Commander_Custom` directory into your workspace (it's just shrink wrapped Eclipse) and you're done.
+Other than the simple python scripts, the firmware is a CMake project. You need CMake (3.22 or later), a build tool such as Ninja, and the `arm-none-eabi` GCC toolchain. On Debian/Ubuntu:
 
-There are two Build target, one called `DFU Release` for the DFU (with offset linker script and vector table) and the other called `Debug` for use with a ST-Link debugger. To build a DFU file for upload you'll need to build the binary in the IDE, then use the DFU packing tool that comes with the DFU uploader (can't remember their exact names off the top of my head.) Using the Intel HEX format file instead of the .bin saves you having to input the flash offset.
+```
+sudo apt install cmake ninja-build gcc-arm-none-eabi binutils-arm-none-eabi
+```
+
+In VS Code, install the [STM32 VS Code Extension](https://marketplace.visualstudio.com/items?itemName=STMicroelectronics.stm32-vscode-extension) and open the `MIDI_Commander_Custom` folder. The build configurations are picked up from `CMakePresets.json`. Alternatively, build from the command line:
+
+```
+cd MIDI_Commander_Custom
+cmake --preset "DFU Release"
+cmake --build --preset "DFU Release"
+```
+
+There are two build presets. `DFU Release` is the one to flash through the DFU bootloader: it is optimised, linked at `0x8003000` with the offset linker script, and relocates the vector table to match. `Debug` is unoptimised and linked at the start of flash for use with an ST-Link debugger.
+
+Each build writes `MIDI_Commander_Custom.elf`, `.hex`, and `.bin` into `build/<preset name>/`. The `DFU Release` preset additionally packs `MIDI_Commander_Custom.dfu`, ready to upload — building it is a single step, and no ST tooling is involved.
+
+The `Debug` preset deliberately does not produce a `.dfu`. It is linked at the start of flash, so uploading one through the bootloader would overwrite the bootloader itself.
+
+Packing needs Python 3 on the `PATH`. If CMake cannot find it you still get the `.elf`, `.hex`, and `.bin`, and the build prints a warning rather than failing.
+
+### Packing a DFU file by hand
+
+`DFU/bin_to_dfu.py` is a standalone tool, so an existing build can be packed without rebuilding it:
+
+```
+python3 DFU/bin_to_dfu.py "MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.hex" \
+    -o DFU/DFU_OUT/generated.dfu
+```
+
+Giving it the Intel HEX file saves you having to state the flash offset, since the address is already recorded in the file. To pack a raw binary instead, name the load address explicitly:
+
+```
+python3 DFU/bin_to_dfu.py "MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin" \
+    -a 0x8003000 -o DFU/DFU_OUT/generated.dfu
+```
+
+Both routes produce the same file.
+
+If your `arm-none-eabi-gcc` is not on the `PATH` — for instance if you want to use the copy bundled with STM32CubeIDE — point CMake at it when configuring:
+
+```
+cmake --preset "DFU Release" -DTOOLCHAIN_PREFIX=/path/to/toolchain/bin/
+```
 
 ## Loading the firmware
 
-### macOS
+The firmware is loaded with [dfu-util](https://dfu-util.sourceforge.net/), which works the same way on Linux, macOS and Windows:
 
-On macOS the firmware can be loaded with [dfu-util](https://dfu-util.sourceforge.net/) which can be installed using [Homebrew](https://brew.sh/) with a simple `brew install dfu-util`.
+| | |
+|---|---|
+| Linux | `sudo apt install dfu-util` (or your distribution's equivalent) |
+| macOS | `brew install dfu-util` using [Homebrew](https://brew.sh/) |
+| Windows | Download the binaries from the [dfu-util site](https://dfu-util.sourceforge.net/), then use [Zadig](https://zadig.akeo.ie/) to assign the WinUSB driver to the device while it is in DFU mode |
 
 Then you connect the Midi Commander to the USB port of the computer and start it in DFU mode by holding down the `bank down` and `D` buttons (the two buttons on the bottom-right corner) while pressing the power button. The device should start with nothing on the display, and the LED 3 turned on.
 
@@ -202,13 +248,21 @@ If you have a DFU file (e.g. from `DFU/DFU_OUT/generated-*.dfu`), you can load i
 dfu-util --alt 0 --download ./DFU/DFU_OUT/generated-*.dfu
 ```
 
-If you are building the firmware yourself on macOS, it is unclear how you can create a DFU file. Instead you should use a binary file and specify the load address explicitly. To do that, use the `DFU Release` build target in STM32CubeIDE to produce a `.bin` binary file that you can load as follows:
+If you are building the firmware yourself, you can skip the `.dfu` packaging altogether and load the binary directly, naming the load address explicitly:
 
 ```
-dfu-util --alt 0 -s 0x8003000 --download "./MIDI_Commander_Custom/DFU Release/MIDI_Commander_Custom.bin"
+dfu-util --alt 0 -s 0x8003000 --download "./MIDI_Commander_Custom/build/DFU Release/MIDI_Commander_Custom.bin"
 ```
+
+If you would rather produce a `.dfu` — to share a build with someone else, for instance — see [Packing a DFU file by hand](#packing-a-dfu-file-by-hand) above.
 
 Once the firmware is loaded, turn off the device and turn it back on in normal mode. You should see the name and version of the custom firmware on the display briefly, and then the name of the first configured bank. You can now load your own configuration following the instructions in the section [Configuration](#configuration).
+
+### Going back to the MeloAudio firmware
+
+The stock firmware is loaded with MeloAudio's own updater, which is built on ST's DfuSe tools rather than dfu-util. On Windows those two want different USB drivers, so if you used Zadig to switch the device to WinUSB you will need to point the driver back at ST's before the MeloAudio updater will see it. A copy of the ST tools and their drivers is kept in this repository under `DFU/MidiCommander_DFU_APP/`, and they are also available from ST as package STSW-STM32080. Nothing in this project uses them otherwise.
+
+Your MeloAudio configuration is not affected by any of this: the custom firmware keeps its settings in the microcontroller's own flash memory, and never touches the external EEPROM that the stock firmware stores its configuration in.
 
 ## Python development
 Python files under `python/` can be edited directly, however it is recommended to use the VS Code workspace at the root of this repository with the recommended extensions. It is configured to use auto-formatting with Black and type checking with MyPy.

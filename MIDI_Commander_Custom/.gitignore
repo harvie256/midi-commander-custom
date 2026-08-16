@@ -1,2 +1,2 @@
-Debug/
-DFU Release/
+build/
+compile_commands.json
