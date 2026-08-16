@@ -1,6 +1,6 @@
 # MIDI Commander Studio
 
-MIDI Commander Studio is a cross-platform local browser application backed by Python. It is designed to minimize Terminal or Command Prompt use while preserving compatibility with the original firmware and CSV tooling.
+MIDI Commander Studio is a cross-platform local browser application backed by Python. It is designed to minimize Terminal or Command Prompt use, and is the only supported way to configure the pedal.
 
 ## Support status
 
@@ -14,7 +14,7 @@ Double-click `Launch MIDI Commander Studio.command` in the repository root. The 
 
 The application has three workspaces:
 
-- **Editor** — edit eight banks, eight buttons per bank, and up to ten commands per button. Projects autosave locally in the browser. Save a `.mcs.json` project to keep friendly button labels; export CSV for compatibility with the original uploader.
+- **Editor** — edit eight banks, eight buttons per bank, and up to ten commands per button. Projects autosave locally in the browser. Save a `.mcs.json` project file to keep a configuration outside the browser; it is the only export format.
 - **Device** — select CoreMIDI input/output endpoints, test commands, validate the packed 2,688-byte configuration, and upload it over SysEx. The pedal must be running the custom firmware in normal mode.
 - **Firmware** — check for `dfu-util`, verify `0483:df11 / alt 0 / Internal Flash`, and install only the bundled custom DFU. This workflow requires explicit recovery confirmation.
 
@@ -42,13 +42,13 @@ Use the power button in the top-right corner to stop the local service, or run `
 
 - `studio/frontend/src` — React + TypeScript user interface.
 - `studio/frontend/dist` — production build served by Python; Node.js is not needed for normal use.
-- `studio/backend` — FastAPI service, project/CSV conversion, validation, MIDI upload, and DFU orchestration.
+- `studio/backend` — FastAPI service, validation, flash encoding, MIDI upload, and DFU orchestration.
 - `studio/requirements.txt` — isolated runtime dependencies.
 - `Launch MIDI Commander Studio.cmd` / `.ps1` — Windows setup and launcher.
 - `Launch MIDI Commander Studio.command` — macOS setup and launcher.
 - `Launch MIDI Commander Studio.sh` — Linux setup and launcher.
 
-The backend reuses `python/lib/settingsBinaryPacker.py` and `python/lib/cmdBinaryPacker.py`, so packed configurations match the existing firmware format.
+`studio/backend/flash_packer.py` encodes a project into the firmware's flash image. Its constants are mirrored from the firmware headers and checked against them by `tests/test_flash_packer.py`, which also pins the output against a golden image.
 
 ## Development
 

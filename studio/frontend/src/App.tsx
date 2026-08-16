@@ -56,7 +56,6 @@ export default function App() {
   const [firmwareSource, setFirmwareSource] = useState<FirmwareSource | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [toast, setToast] = useState<{ message: string; tone: 'success' | 'error' | 'info' } | null>(null)
-  const csvInput = useRef<HTMLInputElement>(null)
   const projectInput = useRef<HTMLInputElement>(null)
   const uploadJob = useJob(uploadJobId)
   const firmwareJob = useJob(firmwareJobId)
@@ -104,17 +103,6 @@ export default function App() {
 
   if (!project) return <div className="loading-screen"><span className="loading-mark" />Loading MIDI Commander Studio…</div>
 
-  const importCsv = async (file: File) => {
-    try {
-      const imported = await api.importCsv(file)
-      setProject(imported)
-      setSelectedBank(0); setSelectedButton(0); setSelectedCommand(0)
-      show(`Imported ${file.name}.`, 'success')
-    } catch (error) {
-      show(error instanceof Error ? error.message : 'CSV import failed.', 'error')
-    }
-  }
-
   const importProject = async (file: File) => {
     try {
       const parsed = JSON.parse(await file.text()) as StudioProject
@@ -123,6 +111,7 @@ export default function App() {
       if (checked.issues.some((issue) => issue.level === 'error')) throw new Error(checked.issues.find((issue) => issue.level === 'error')!.message)
       setProject(parsed)
       setSettingsOpen(false)
+      setSelectedBank(0); setSelectedButton(0); setSelectedCommand(0)
       show(`Opened ${file.name}.`, 'success')
     } catch (error) {
       show(error instanceof Error ? error.message : 'Project import failed.', 'error')
@@ -132,15 +121,6 @@ export default function App() {
   const saveProject = () => {
     download(new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' }), `${project.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'midi-commander'}.mcs.json`)
     show('Project file saved.', 'success')
-  }
-
-  const exportCsv = async () => {
-    try {
-      download(await api.exportCsv(project), `${project.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'midi-commander'}.csv`)
-      show('Compatible CSV exported.', 'success')
-    } catch (error) {
-      show(error instanceof Error ? error.message : 'CSV export failed.', 'error')
-    }
   }
 
   const testCommand = async (command: MidiCommand) => {
@@ -196,9 +176,8 @@ export default function App() {
       page={page}
       connected={devices.connected}
       onNavigate={setPage}
-      onImportCsv={() => csvInput.current?.click()}
+      onOpenProject={() => projectInput.current?.click()}
       onSaveProject={saveProject}
-      onExportCsv={() => void exportCsv()}
       onUpload={() => setPage('device')}
       onRefresh={contextualRefresh}
       onQuit={() => void quit()}
@@ -241,8 +220,7 @@ export default function App() {
       onInstallDependency={() => void installDependency()}
       onInstallFirmware={() => void installFirmware()}
     />}
-    <ProjectSettingsDialog open={settingsOpen} project={project} onChange={setProject} onClose={() => setSettingsOpen(false)} onImportProject={() => projectInput.current?.click()} />
-    <input ref={csvInput} type="file" accept=".csv,text/csv" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void importCsv(file); event.target.value = '' }} />
+    <ProjectSettingsDialog open={settingsOpen} project={project} onChange={setProject} onClose={() => setSettingsOpen(false)} />
     <input ref={projectInput} type="file" accept=".json,.mcs.json,application/json" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void importProject(file); event.target.value = '' }} />
     {toast && <Toast message={toast.message} tone={toast.tone} onClose={() => setToast(null)} />}
   </div>

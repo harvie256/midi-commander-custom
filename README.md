@@ -7,22 +7,21 @@ This project provides the following components that work together:
 
 1. A custom firmware to be loaded onto the Midi Commander (e.g. using DFU tool)
 
-2. A publicly available configuration template spreadsheet on Google Sheets that you can customize to your needs
-
-3. The `python/CSV_to_Flash.py` tool that can load a configuration spreadsheet to the Midi Commander through a simple USB connection
+2. **MIDI Commander Studio**, a visual editor that configures the pedal and installs firmware over USB
 
 # MIDI Commander Studio (macOS, Windows, and Linux GUI)
 
-This repository now includes **MIDI Commander Studio**, a local visual editor for macOS, Windows, and Linux. It provides a pedal-style bank and button editor, project autosave, CSV import/export, direct configuration upload, MIDI device diagnostics, and a guarded firmware installation workflow.
+**MIDI Commander Studio** is a local visual editor for macOS, Windows, and Linux, and the only supported way to configure the pedal. It provides a pedal-style bank and button editor, project autosave, direct configuration upload, MIDI device diagnostics, and a guarded firmware installation workflow.
+
+> **Note for existing users:** the previous CSV spreadsheet workflow and the `python/CSV_to_Flash.py` command-line tool have been removed, along with Studio's CSV import and export. Planned features change the configuration model in ways the CSV layout cannot follow. If you still have a CSV configuration, check out a revision of this repository from before the removal, import the CSV in that older Studio, and save it as a `.mcs.json` project file.
 
 ## Purpose
 
-MIDI Commander Studio replaces the manual CSV-editing and command-line upload workflow with one local browser interface. It is intended for users of this repository's custom firmware who want to:
+MIDI Commander Studio is one local browser interface for everything. It is intended for users of this repository's custom firmware who want to:
 
 - visually configure all eight banks and eight switches;
 - assign up to ten ordered MIDI commands to each switch;
 - validate MIDI channels, controller numbers, values, names, and firmware limits before uploading;
-- import or export repository-compatible CSV files;
 - install the bundled custom firmware with explicit DFU target checks; and
 - upload a validated 2,688-byte configuration directly over USB MIDI.
 
@@ -43,7 +42,7 @@ The application runs locally at `http://127.0.0.1:8765`. Project data stays in t
 3. If the pedal still has stock firmware, use **Firmware** once to install the bundled custom firmware, then power-cycle normally.
 4. Use **Editor** to configure banks, switches, and MIDI commands. Fix any validation messages shown by Studio.
 5. Use **Device** to select the pedal's MIDI input/output ports and upload the configuration.
-6. Save a `.mcs.json` project for future editing and optionally export CSV for the original tooling.
+6. Save a `.mcs.json` project file — this is the only way to keep a configuration outside the browser.
 
 ## Start the Studio on macOS
 
@@ -81,7 +80,7 @@ Stop the local service with the power button in the top-right corner, or run `./
 
 Installing firmware over DFU needs write access to the USB device. Either run the DFU step as root or add a udev rule for the pedal's bootloader (`0483:df11`) so it is writable by your user.
 
-Use the **Editor** to design banks and commands, **Device** to upload a configuration while the pedal is in normal mode, and **Firmware** only when installing the bundled custom firmware in DFU mode. The Studio automatically creates repository-compatible CSV files, so the command-line workflow remains available.
+Use the **Editor** to design banks and commands, **Device** to upload a configuration while the pedal is in normal mode, and **Firmware** only when installing the bundled custom firmware in DFU mode.
 
 See [`studio/README.md`](studio/README.md) for implementation and development details.
 
@@ -98,7 +97,7 @@ The DFU binary is uploaded with `dfu-util`, on any operating system — see [Loa
 
 # Current features list
 - Completely open source, so feel free to contribute (even just bug reports! or better still user guides)
-- "Spreadsheet" based configuration, no scrolling through menus on that tiny screen with huge buttons. Easy Copy/Paste, Fill, etc. Easy sharing.
+- Visual configuration from a computer, no scrolling through menus on that tiny screen with huge buttons. Projects save to a single file, so they are easy to keep and share.
 - Supports Program Change (aka Patch Change), Controller Change, Note, Pitch Bend and Start/Stop messages for any of the buttons.
 - The Channel for each message is configured on each individual command.  So it can address seperate pieces of hardware in a midi chain.
 - 8 banks of 8 buttons.  Each bank can display message strings for identification.
@@ -119,13 +118,10 @@ The DFU binary is uploaded with `dfu-util`, on any operating system — see [Loa
 
 
 # Configuration
-The configuration is done via a spreadsheet. Here is a publicly available template on Google Sheets that you can copy and customize to your needs:
 
-https://docs.google.com/spreadsheets/d/1KwKj3sYrNEkEl8ONipW-ZGSLD7r_W1NfWwyGgjnbk08/edit?usp=sharing
+Configuration is done in **MIDI Commander Studio** — see [the Studio section above](#midi-commander-studio-macos-windows-and-linux-gui) for how to start it. The **Editor** page lays out all eight banks and eight switches; **Device** uploads the result to the pedal over USB.
 
-(a copy of this spreasheet is also availble in the repository at `python/MeloConfig_10_Cmds - RC-600.csv`)
-
-Roughly, the spreadsheet allows you to specify for each button press up to 10 independant MIDI commands. For each command the following characteristics can be chosen independently:
+Studio allows you to specify for each button press up to 10 independant MIDI commands. For each command the following characteristics can be chosen independently:
 
 - Type: PC/CC/Note/PB (Pitch Bend)/Start/Stop
 - Midi Channel
@@ -140,45 +136,23 @@ Roughly, the spreadsheet allows you to specify for each button press up to 10 in
 - Note velocity
 - Note/PB duration (up to 2.5 seconds in 10ms increments)
 
-Any line containing a `#` is discarded, which allows you to include comments in the configuration file to keep track of your work. Note that the `#` does not have to be at the start of the line: a `#` anywhere in a row (including inside a bank name or other cell value) causes the whole line to be dropped, so avoid using it in your configuration data.
+Studio validates these against the firmware's limits as you edit, and refuses to upload a configuration that would not fit.
 
-Lines containing a `*` are section titles that mark the start of each configuration table (`Global_Settings`, `Bank_Naming`, `Button_Settings`), so `*` cannot be used for comments either.
+Save your work with **Save project** in the header, which writes a `.mcs.json` file, and reload it later with **Open project**. Studio also keeps the current project in the browser's local storage automatically, but the project file is the only copy that survives clearing site data or moving to another computer.
 
-Once you are happy with your configuration, download it from Google Sheets as a CSV file (or use "Save As" if you chose to edit it locally with Excel or similar spreadsheet software).
-
-Then prepare a Python environment as follows:
-
-1. Download and install [Python](https://www.python.org/).
-2. Check out this repository with Git or download it as a Zip and extract it somewhere.
-3. Open a Terminal (or Windows Command Prompt) and run the following:
-
-   ```
-   cd /path/to/midi-commander-custom
-   python3 -m venv python/.venv
-   python/.venv/bin/python -m pip install -r python/requirements.txt
-   python/.venv/bin/python python/CSV_to_Flash.py -h
-   ```
-
-   On Windows the interpreter is at `python\.venv\Scripts\python.exe` instead.
-
-   If your setup is successful, the last command should display the help message of the tool.
-
-   The virtual environment is not just tidiness: current Debian and Ubuntu mark
-   the system Python as externally managed (PEP 668) and refuse `pip install`
-   into it, with or without `sudo`.
-
-Once your Python environment is operational, you can load your configuration onto the Midi Commander as follows:
+To load a configuration onto the Midi Commander:
 
 1. Turn on the Midi Commander in normal mode (not DFU)
 2. Connect it to the USB port of your computer
-3. Run the following in a Terminal or in the Windows Command Prompt:
+3. Open the **Device** page, select the pedal's MIDI input and output ports, and upload
 
-   ```
-   cd /path/to/midi-commander-custom
-   python3 python/CSV_to_Flash.py /path/to/you/configuration-file.csv
-   ```
+Studio converts the project to the firmware's binary format and transmits it over USB MIDI. At the end of the operation the Midi Commander restarts to load the new configuration.
 
-The tool will convert the CSV file to a binary format and transmit it to the Midi Commander. At the end of the operation the Midi Commander should restart to load the new configuration.
+## The old spreadsheet workflow
+
+Configuration used to be a Google Sheets template exported as CSV and uploaded with `python/CSV_to_Flash.py`. That tool and all CSV support have been removed, because planned features change the configuration model in ways the CSV layout cannot follow.
+
+If you have an existing CSV configuration, check out a revision of this repository from before the removal, import the CSV there, and save it as a `.mcs.json` project file that current Studio can open.
 
 # Basic instructions for setting up development environment
 Other than the simple python scripts, the firmware is a CMake project. You need CMake (3.22 or later), a build tool such as Ninja, and the `arm-none-eabi` GCC toolchain. On Debian/Ubuntu:
@@ -272,9 +246,10 @@ The stock firmware is loaded with MeloAudio's own updater, which is built on ST'
 Your MeloAudio configuration is not affected by any of this: the custom firmware keeps its settings in the microcontroller's own flash memory, and never touches the external EEPROM that the stock firmware stores its configuration in.
 
 ## Python development
-Python files under `python/` can be edited directly, however it is recommended to use the VS Code workspace at the root of this repository with the recommended extensions. It is configured to use auto-formatting with Black and type checking with MyPy.
 
-The main entry point is `python/CSV_to_Flash.py` and some functionality is offloaded to modules under `python/lib`.
+The Python code lives under `studio/backend/`. It is recommended to use the VS Code workspace at the root of this repository with the recommended extensions; it is configured to use auto-formatting with Black and type checking with MyPy.
+
+The entry point is `studio/backend/app.py` (a FastAPI application). Configuration validation lives in `config_service.py`, the flash encoder in `flash_packer.py`, and MIDI and DFU handling in `device_service.py`. Tests are under `studio/backend/tests/` — run them with `python -m pytest studio/backend/tests` from the repository root. See [`studio/README.md`](studio/README.md) for more.
 
 # Acknowledgements
 

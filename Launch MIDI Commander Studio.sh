@@ -44,7 +44,7 @@ if [[ ! -x "$STUDIO_VENV/bin/python" ]]; then
   fi
 fi
 
-if ! "$STUDIO_VENV/bin/python" -c 'import fastapi, mido, pandas, rtmidi, uvicorn' >/dev/null 2>&1; then
+if ! "$STUDIO_VENV/bin/python" -c 'import fastapi, mido, rtmidi, uvicorn' >/dev/null 2>&1; then
   echo "Installing Studio components…"
   if ! "$STUDIO_VENV/bin/python" -m pip install --disable-pip-version-check -r "$STUDIO_ROOT/studio/requirements.txt" >"$STUDIO_RUNTIME/install.log" 2>&1; then
     report_error "Studio setup failed" "Dependency installation failed. Open .studio-runtime/install.log in the repository folder for details. python-rtmidi needs a C++ toolchain and ALSA headers if no wheel is available: sudo apt install build-essential libasound2-dev libjack-jackd2-dev"

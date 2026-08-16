@@ -1,4 +1,0 @@
-argparse
-pandas
-mido
-python-rtmidi

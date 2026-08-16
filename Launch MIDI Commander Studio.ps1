@@ -63,7 +63,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw "Python could not create the private Studio environment." }
     }
 
-    & $VenvPython -c "import fastapi, mido, pandas, rtmidi, uvicorn" 2>$null
+    & $VenvPython -c "import fastapi, mido, rtmidi, uvicorn" 2>$null
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Installing Studio components..."
         & $VenvPython -m pip install --disable-pip-version-check -r (Join-Path $StudioRoot "studio\requirements.txt") *>&1 | Tee-Object -FilePath $InstallLog

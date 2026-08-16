@@ -16,7 +16,8 @@ from typing import Any
 
 import mido
 
-from .config_service import FLASH_CONTENT_SIZE, pack_project
+from .config_service import pack_project
+from .flash_packer import FLASH_CONTENT_SIZE
 from .jobs import Job
 from .models import MidiCommand, StudioProject
 

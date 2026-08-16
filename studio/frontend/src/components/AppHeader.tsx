@@ -1,7 +1,6 @@
 import {
   Cpu,
-  Download,
-  FileUp,
+  FolderOpen,
   Pencil,
   Power,
   RefreshCw,
@@ -15,9 +14,8 @@ interface Props {
   page: AppPage
   connected: boolean
   onNavigate: (page: AppPage) => void
-  onImportCsv: () => void
+  onOpenProject: () => void
   onSaveProject: () => void
-  onExportCsv: () => void
   onUpload: () => void
   onRefresh: () => void
   onQuit: () => void
@@ -27,9 +25,8 @@ export function AppHeader({
   page,
   connected,
   onNavigate,
-  onImportCsv,
+  onOpenProject,
   onSaveProject,
-  onExportCsv,
   onUpload,
   onRefresh,
   onQuit,
@@ -57,14 +54,11 @@ export function AppHeader({
         </span>
         {page === 'editor' ? (
           <>
-            <button className="button secondary compact" onClick={onImportCsv}>
-              <FileUp size={17} /> Import CSV
+            <button className="button secondary compact" onClick={onOpenProject}>
+              <FolderOpen size={17} /> Open project
             </button>
             <button className="button secondary compact" onClick={onSaveProject}>
               <Save size={17} /> Save project
-            </button>
-            <button className="button secondary compact" onClick={onExportCsv}>
-              <Download size={17} /> Export CSV
             </button>
             <button className="button primary compact" onClick={onUpload}>
               <Upload size={17} /> Upload to pedal

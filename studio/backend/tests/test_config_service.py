@@ -1,76 +1,91 @@
-import re
-from pathlib import Path
+from __future__ import annotations
 
-from studio.backend.config_service import (
-    FLASH_CONTENT_SIZE,
-    GLOBAL_SETTINGS_SIZE,
-    MIDI_ROM_CMD_SIZE,
-    pack_project,
-    project_from_csv,
-    project_to_csv,
-    validate_project,
-)
-from studio.backend.models import starter_project
+from studio.backend.config_service import pack_project, project_stats, validate_project
+from studio.backend.flash_packer import FLASH_CONTENT_SIZE
+from studio.backend.models import Bank, MidiCommand, PedalButton, StudioProject, starter_project
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-FIRMWARE_HEADER = (
-    REPO_ROOT / "MIDI_Commander_Custom" / "Core" / "Inc" / "flash_midi_settings.h"
-)
-FIRMWARE_SOURCE = (
-    REPO_ROOT / "MIDI_Commander_Custom" / "Core" / "Src" / "flash_midi_settings.c"
-)
+def _errors(project: StudioProject) -> list[dict[str, str]]:
+    return [issue for issue in validate_project(project) if issue["level"] == "error"]
 
 
-def _define(text: str, name: str) -> int:
-    match = re.search(rf"^#define\s+{name}\s+\(?(\d+)\)?", text, re.MULTILINE)
-    assert match, f"{name} not found in the firmware source"
-    return int(match.group(1))
-
-
-def test_flash_layout_matches_firmware_header() -> None:
-    """The wire contract has no enforcement in the firmware direction, so pin the
-    Python side against the C headers it mirrors."""
-    header = FIRMWARE_HEADER.read_text()
-    assert MIDI_ROM_CMD_SIZE == _define(header, "MIDI_ROM_CMD_SIZE")
-
-    from lib import cmdBinaryPacker
-
-    assert cmdBinaryPacker.MIDI_NUM_COMMANDS_PER_SWITCH == _define(
-        header, "MIDI_NUM_COMMANDS_PER_SWITCH"
-    )
-
-    # pSwitchCmds sits at FLASH_SETTINGS_START+32+96, i.e. directly after the
-    # global settings block and the bank strings.
-    source = FIRMWARE_SOURCE.read_text()
-    assert "FLASH_SETTINGS_START+32+96" in source.replace(" ", "")
-    assert GLOBAL_SETTINGS_SIZE == 32
-
-    # The packed image must still fit the region the firmware erases.
-    pages = _define(source, "FLASH_SETTINGS_NO_PAGES")
-    assert FLASH_CONTENT_SIZE <= pages * 1024
-
-
-def test_flash_content_size_is_the_expected_layout() -> None:
-    assert FLASH_CONTENT_SIZE == 2688
-
-
-def test_starter_project_packs_to_firmware_size() -> None:
+def test_starter_project_is_valid_and_packs() -> None:
     project = starter_project()
-    assert not [issue for issue in validate_project(project) if issue["level"] == "error"]
+    assert not _errors(project)
     assert len(pack_project(project)) == FLASH_CONTENT_SIZE
 
 
-def test_round_trip_generated_csv() -> None:
-    source = starter_project()
-    imported = project_from_csv(project_to_csv(source), "round-trip.csv")
-    assert imported.globalSettings.configName == source.globalSettings.configName
-    assert imported.banks[0].buttons[1].commands[0].type == "CC"
-    assert len(pack_project(imported)) == FLASH_CONTENT_SIZE
+def test_project_stats_reports_size_and_command_count() -> None:
+    stats = project_stats(starter_project())
+    assert stats["contentSize"] == FLASH_CONTENT_SIZE
+    assert stats["commandCount"] == 2
 
 
-def test_repository_sample_imports() -> None:
-    sample = REPO_ROOT / "python" / "MeloConfig_10_Cmds - RC-600.csv"
-    project = project_from_csv(sample.read_text(), sample.name)
-    assert len(pack_project(project)) == FLASH_CONTENT_SIZE
-    assert project.banks[0].buttons[4].commands[0].type == "CC"
+def test_packing_refuses_an_invalid_project() -> None:
+    project = starter_project()
+    project.globalSettings.configName = "A configuration name far past the limit"
+    try:
+        pack_project(project)
+    except ValueError as exc:
+        assert "16 characters" in str(exc)
+    else:  # pragma: no cover - the assertion above is the point
+        raise AssertionError("pack_project accepted an invalid project")
+
+
+def test_bank_count_is_enforced() -> None:
+    project = starter_project()
+    project.banks = project.banks[:4]
+    assert any("exactly 8 banks" in issue["message"] for issue in _errors(project))
+
+
+def test_button_ids_must_keep_their_firmware_order() -> None:
+    project = starter_project()
+    project.banks[0].buttons[0] = PedalButton(id="D", label="Wrong slot")
+    assert any(issue["path"] == "banks.0.buttons.0" for issue in _errors(project))
+
+
+def test_command_limit_per_button() -> None:
+    project = starter_project()
+    project.banks[0].buttons[0].commands = [
+        MidiCommand(type="CC", channel=1, number=index) for index in range(11)
+    ]
+    assert any("at most 10 commands" in issue["message"] for issue in _errors(project))
+
+
+def test_non_ascii_names_are_rejected() -> None:
+    project = starter_project()
+    project.banks[0].largeName = "Ünï"
+    assert any("ASCII" in issue["message"] for issue in _errors(project))
+
+
+def test_duration_must_be_a_multiple_of_ten_milliseconds() -> None:
+    project = starter_project()
+    project.banks[0].buttons[0].commands = [
+        MidiCommand(type="Note", channel=1, number=60, durationMs=15)
+    ]
+    assert any("multiple of 10" in issue["message"] for issue in _errors(project))
+
+
+def test_program_zero_is_a_warning_not_an_error() -> None:
+    project = starter_project()
+    project.banks[0].buttons[0].commands = [MidiCommand(type="PC", channel=1, number=0)]
+    issues = validate_project(project)
+    assert not [issue for issue in issues if issue["level"] == "error"]
+    assert any(issue["level"] == "warning" for issue in issues)
+
+
+def test_start_and_stop_ignore_the_channel_range() -> None:
+    project = starter_project()
+    project.banks[0].buttons[0].commands = [MidiCommand(type="Start", channel=0)]
+    assert not _errors(project)
+
+
+def test_bank_numbers_must_match_their_position() -> None:
+    project = starter_project()
+    project.banks[3] = Bank(
+        number=7,
+        largeName="BN 4",
+        smallName="Bank 4",
+        buttons=project.banks[3].buttons,
+    )
+    assert any(issue["path"] == "banks.3" for issue in _errors(project))

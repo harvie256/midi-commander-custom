@@ -50,20 +50,4 @@ export const api = {
   installFirmware: (recoveryConfirmed: boolean, source: FirmwareSource | null) =>
     postJson<{ jobId: string }>('/api/firmware/install', { recoveryConfirmed, source }),
   shutdown: () => postJson<{ stopping: boolean }>('/api/shutdown', {}),
-  importCsv: async (file: File) => {
-    const data = new FormData()
-    data.append('file', file)
-    const response = await fetch('/api/csv/import', { method: 'POST', body: data })
-    if (!response.ok) throw await responseError(response)
-    return response.json() as Promise<StudioProject>
-  },
-  exportCsv: async (project: StudioProject) => {
-    const response = await fetch('/api/csv/export', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(project),
-    })
-    if (!response.ok) throw await responseError(response)
-    return response.blob()
-  },
 }

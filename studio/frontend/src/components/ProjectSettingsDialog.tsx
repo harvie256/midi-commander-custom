@@ -6,10 +6,9 @@ interface Props {
   project: StudioProject
   onChange: (project: StudioProject) => void
   onClose: () => void
-  onImportProject: () => void
 }
 
-export function ProjectSettingsDialog({ open, project, onChange, onClose, onImportProject }: Props) {
+export function ProjectSettingsDialog({ open, project, onChange, onClose }: Props) {
   if (!open) return null
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
@@ -34,10 +33,9 @@ export function ProjectSettingsDialog({ open, project, onChange, onClose, onImpo
             <input type="checkbox" checked={project.globalSettings.realtimePassthrough} onChange={(event) => onChange({ ...project, globalSettings: { ...project.globalSettings, realtimePassthrough: event.target.checked } })} />
             <span><strong>Realtime passthrough</strong><small>Forward USB clock, start, and stop messages to the 5-pin MIDI output.</small></span>
           </label>
-          <p className="field-note">The legacy global MIDI channel is retained for CSV compatibility. Commands use their own channel settings.</p>
+          <p className="field-note">The global MIDI channel is stored in pedal memory for compatibility, but each command carries its own channel.</p>
         </div>
         <div className="modal-actions">
-          <button className="button secondary" onClick={onImportProject}>Open project file</button>
           <button className="button primary" onClick={onClose}>Done</button>
         </div>
       </section>

@@ -5,17 +5,11 @@ import os
 import threading
 from pathlib import Path
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .config_service import (
-    pack_project,
-    project_from_csv,
-    project_stats,
-    project_to_csv,
-    validate_project,
-)
+from .config_service import pack_project, project_stats, validate_project
 from .device_service import (
     firmware_status,
     install_dfu_util,
@@ -65,28 +59,6 @@ def validate(project: StudioProject) -> dict[str, object]:
         }
     )
     return {"issues": issues, "stats": stats}
-
-
-@app.post("/api/csv/import")
-async def import_csv(file: UploadFile = File(...)) -> StudioProject:
-    try:
-        raw = await file.read()
-        return project_from_csv(raw.decode("utf-8-sig"), file.filename or "Imported configuration")
-    except (UnicodeDecodeError, ValueError) as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-
-@app.post("/api/csv/export")
-def export_csv(project: StudioProject) -> PlainTextResponse:
-    issues = validate_project(project)
-    errors = [issue for issue in issues if issue["level"] == "error"]
-    if errors:
-        raise HTTPException(status_code=400, detail=errors[0]["message"])
-    return PlainTextResponse(
-        project_to_csv(project),
-        media_type="text/csv",
-        headers={"Content-Disposition": 'attachment; filename="midi-commander-config.csv"'},
-    )
 
 
 @app.post("/api/project/pack")

@@ -24,7 +24,7 @@ if [[ ! -x "$STUDIO_VENV/bin/python" ]]; then
   python3 -m venv "$STUDIO_VENV" || exit 1
 fi
 
-if ! "$STUDIO_VENV/bin/python" -c 'import fastapi, mido, pandas, rtmidi, uvicorn' >/dev/null 2>&1; then
+if ! "$STUDIO_VENV/bin/python" -c 'import fastapi, mido, rtmidi, uvicorn' >/dev/null 2>&1; then
   echo "Installing Studio components…"
   if ! "$STUDIO_VENV/bin/python" -m pip install --disable-pip-version-check -r "$STUDIO_ROOT/studio/requirements.txt" >"$STUDIO_RUNTIME/install.log" 2>&1; then
     /usr/bin/osascript -e 'display alert "Studio setup failed" message "Open .studio-runtime/install.log in the repository folder for details." as critical'

@@ -4,14 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Replacement firmware for the MeloAudio MIDI Commander (a MIDI foot controller), plus the host-side tooling to configure it. Four pieces that must stay in sync:
+Replacement firmware for the MeloAudio MIDI Commander (a MIDI foot controller), plus the host-side tooling to configure it. Three pieces that must stay in sync:
 
 1. **Firmware** — `MIDI_Commander_Custom/`, a CMake project for an STM32F103RET (256 KiB+ flash, 12 MHz crystal, SSD1306 OLED on I2C1 @0x3C, MIDI DIN out on USART2). Still carries a CubeMX `.ioc`.
-2. **Config tool** — `python/CSV_to_Flash.py`, packs a CSV config into the firmware's binary layout and pushes it over USB MIDI SysEx.
+2. **MIDI Commander Studio** — `studio/`, a local-only GUI (FastAPI backend + React frontend, opened in the browser) and the **only** supported way to configure the pedal. Launched by the `Launch MIDI Commander Studio.*` scripts at the repo root.
 3. **DFU packaging** — `DFU/bin_to_dfu.py` wraps a build into a `.dfu`; `DFU/MidiCommander_DFU_APP/` holds the vendored ST Windows tools and drivers.
-4. **MIDI Commander Studio** — `studio/`, a local-only GUI (FastAPI backend + React frontend, opened in the browser) that wraps 2 and 3 for people who don't want a CSV and a terminal. Launched by the `Launch MIDI Commander Studio.*` scripts at the repo root.
 
-The firmware and the CLI tooling have no tests; verification is on hardware. Studio's backend has pytest coverage under `studio/backend/tests/`, and `.github/workflows/studio.yml` runs it plus a frontend type-check and build on all three OSes — but **only** on changes under `studio/`, `python/`, and the launcher scripts. Nothing in CI builds the firmware.
+There used to be a fourth: a `python/CSV_to_Flash.py` CLI that packed a CSV spreadsheet, sharing its encoder with Studio. It was deleted along with all CSV import/export, because planned features change the configuration model in ways the CSV layout could not follow without becoming a compatibility burden. Consequences worth knowing:
+
+- **Projects are `.mcs.json` only.** That is just a serialised `StudioProject`, saved and loaded entirely client-side. Anyone still holding a CSV needs a Studio build from before the removal to convert it.
+- **There is no scripted/headless configuration path.** Everything goes through the GUI.
+- The encoder is no longer shared with anything, so it takes the typed model directly and `pandas` is gone.
+
+The firmware has no tests; verification is on hardware. Studio's backend has pytest coverage under `studio/backend/tests/`, and `.github/workflows/studio.yml` runs it plus a frontend type-check and build on all three OSes — but **only** on changes under `studio/` and the launcher scripts. Nothing in CI builds the firmware.
 
 ## Building
 
@@ -54,17 +59,13 @@ Only the DFU variant gets packed, deliberately — a `Debug` build is linked at 
 - Device enters DFU mode by holding `bank down` + `D` while pressing power.
 - `DFU/MidiCommander_DFU_APP/` holds ST's DfuSe tools and Windows drivers. Nothing in the repo drives them; they are retained only because returning to stock MeloAudio firmware needs a DfuSe-based updater, and on Windows that means switching the USB driver back from the WinUSB one that dfu-util requires. Don't reintroduce them into any build or flash workflow.
 
-**Python tooling:**
+**Linux prerequisite for any Python work here:** `python-rtmidi` is compiled from source whenever no wheel matches your Python (there is none for 3.14, which is what Ubuntu 26.04 ships), so this bites on new distributions rather than being a one-off. It needs `libasound2-dev`; JACK is optional. **Install `libjack-jackd2-dev`, never `libjack-dev`** — the latter is JACK1, and apt satisfies it by removing the JACK2 runtime the rest of the desktop audio stack depends on.
 
 ```
-python3 -m venv python/.venv
-python/.venv/bin/python -m pip install -r python/requirements.txt
-python/.venv/bin/python python/CSV_to_Flash.py <config.csv>
+sudo apt install -y libasound2-dev libjack-jackd2-dev
 ```
 
-A venv is not optional on current Debian/Ubuntu: the system interpreter is marked externally managed (PEP 668), so `pip install` into it is refused with or without `sudo`, and `--user` is refused too.
-
-On Linux, `python-rtmidi` also needs `libasound2-dev` before it will build — `python/linux-prerequisites.sh` installs it and creates the venv. It is compiled from source whenever no wheel matches your Python (there is none for 3.14, which is what Ubuntu 26.04 ships), so this bites on new distributions rather than being a one-off. JACK is optional; ALSA is the hard requirement. **Install `libjack-jackd2-dev`, never `libjack-dev`** — the latter is JACK1, and apt satisfies it by removing the JACK2 runtime the rest of the desktop audio stack depends on.
+A venv is also not optional on current Debian/Ubuntu: the system interpreter is marked externally managed (PEP 668), so `pip install` into it is refused with or without `sudo`, and `--user` is refused too. The launchers already do this correctly.
 
 Python is formatted with Black and type-checked with mypy in basic mode (`.vscode/`); mido's dynamic symbols require `# type: ignore` on its call sites.
 
@@ -79,7 +80,7 @@ python3 -m venv .studio-venv-linux
 .studio-venv-linux/bin/python -m pytest -q studio/backend/tests
 ```
 
-The backend must be started from the repo root — it is a package (`studio.backend.app`), and `config_service.py`/`device_service.py` resolve `REPO_ROOT` by walking up two parents to reach `python/lib/` and `DFU/`.
+The backend must be started from the repo root — it is a package (`studio.backend.app`), and `device_service.py` resolves `REPO_ROOT` by walking up two parents to reach `DFU/` and the firmware build directory.
 
 Frontend work needs Node:
 
@@ -117,20 +118,26 @@ Command lookup is pure pointer arithmetic — `get_rom_pointer(page, sw, cmd)` i
 
 ### The C/Python wire contract
 
-The 4-byte per-command encoding is **written** by `python/lib/cmdBinaryPacker.py` and **decoded** by `Core/Src/midi_cmds.c`. Nothing enforces agreement, so a change on one side needs a matching change on the other. Duplicated constants to keep aligned:
+`studio/backend/flash_packer.py` is the **only** host-side encoder. It takes a `StudioProject` straight from `models.py` and emits the flash image; `Core/Src/midi_cmds.c` decodes it. One encoder, one direction, no intermediate representation.
 
-- Command-type nibbles (`CMD_PC_NIBBLE` etc.) — `Core/Inc/midi_defines.h` ↔ `cmdBinaryPacker.py`
-- `MIDI_NUM_COMMANDS_PER_SWITCH` (10) — `flash_midi_settings.h` ↔ `cmdBinaryPacker.py`
-- `GLOBAL_SETTINGS_*` indices — `midi_defines.h` ↔ `settingsBinaryPacker.py`
-- `FLASH_SETTINGS_NO_PAGES` ↔ `ALLOWED_NUM_FLASH_PAGES` in `CSV_to_Flash.py` (the tool only warns on overflow)
+It used to be two pandas-coupled modules under `python/lib/`, shaped around CSV rows (`row.loc[row.index.str.startswith("A_")]`), with Studio converting its typed model *back* into CSV-shaped DataFrames purely to feed them. Deleting the CSV path removed that whole layer — along with `pandas`, and the "column names are a contract" hazard.
 
-Studio does **not** add a fourth encoder — `studio/backend/config_service.py` imports the same two packers (via a `sys.path` insert of `python/`) and feeds them pandas DataFrames shaped exactly like the ones `CSV_to_Flash.py` builds from a CSV. So the packers stay the single source of truth, but their *input column names* are now a contract too: `COMMAND_FIELDS` in `config_service.py` must match the `A_`…`J_` column suffixes `cmdBinaryPacker.pack_row()` reads.
+Constants are mirrored from the firmware by hand, and **the mirroring is enforced by tests** rather than convention. `test_flash_packer.py` greps the C directly:
+
+- `test_command_nibbles_match_firmware_defines` — every `CMD_*_NIBBLE` and `GLOBAL_SETTINGS_*` against `midi_defines.h`
+- `test_layout_matches_firmware_header` — `MIDI_ROM_CMD_SIZE` and `MIDI_NUM_COMMANDS_PER_SWITCH` against `flash_midi_settings.h`, the `+32+96` pointer offsets and `FLASH_SETTINGS_NO_PAGES` against `flash_midi_settings.c`, and that the image still fits the erased region
+
+Change a `#define` in the firmware without updating the packer and CI fails. That is the only automated link between the C and Python halves of this repo, so keep those tests grepping real source rather than restating values.
+
+`test_reference_configuration_packs_to_known_bytes` pins the output against a golden image in `tests/fixtures/rc600_reference.json`, captured from the pandas implementation before it was deleted. It is the regression guard for the rewrite and for any future change to the encoder.
+
+Encoding conventions live as a docstring in `flash_packer.py`. The one worth repeating: the firmware's "no value" test is `> 0x7F`, not `== 0x80` — `midi_cmds.c` returns early when `pRom[3] > 0x7F` for a CC off-value, and treats bank-select bytes as present only when `< 0x80`. The old CSV path wrote `255` for a suppressed CC off-value; the packer now writes `0x80`. Both suppress identically.
 
 Encoding conventions worth knowing: byte 0 is command nibble | channel; the toggle flag is the top bit of byte 1; the "no value" sentinel is `0x80` (used to suppress bank-select bytes in PC commands and the off-value in CC); note/PB duration is byte 3 in 10 ms units.
 
 ### Config transfer protocol (USB SysEx)
 
-`USB_DEVICE/App/usbd_midi_if.c` implements the device side. There are **two** host-side implementations: `CSV_to_Flash.py` and `studio/backend/device_service.py`, which re-declares the same opcodes (`ERASE_FLASH = 52`, `WRITE_FLASH = 54`, `RESET = 60`, …) rather than importing them. A protocol change needs editing all three.
+`USB_DEVICE/App/usbd_midi_if.c` implements the device side and `studio/backend/device_service.py` the host side — one each, since the CLI was removed. `device_service.py` re-declares the opcodes (`ERASE_FLASH = 52`, `WRITE_FLASH = 54`, `RESET = 60`, …) rather than deriving them from `midi_defines.h`, and unlike the packer constants nothing tests that mirroring.
 
 Private-use manufacturer ID `0x7D`. Erase (52) requires the check words `0x42 0x24` and replies 53; write (54) carries a 16-byte-page address as two 7-bit bytes followed by 16 bytes split into 32 nibbles, and replies 55; reset (60) calls `NVIC_SystemReset()`. The host waits for each reply before sending the next chunk. Nibble-splitting exists because SysEx data bytes must stay under 0x80.
 
@@ -157,7 +164,7 @@ Route order matters in `app.py`: the static-file mount and the `@app.get("/{full
 
 **Three pages, three backends:**
 
-- **Editor** (`config_service.py`) — pure data. Import/export the CSV format, validate, and pack. `validate_project()` returns a flat list of `{level, path, message}`; `error` blocks packing and upload, `warning` does not. It is the only place the firmware's field limits are enforced host-side (16-char config name, 4/8-char bank names, 8 banks × 8 buttons × ≤10 commands, channel 1–16, duration a multiple of 10 ms up to 1270).
+- **Editor** (`config_service.py` + `flash_packer.py`) — pure data: validate, then pack. `validate_project()` returns a flat list of `{level, path, message}`; `error` blocks packing and upload, `warning` does not. It is the only place the firmware's field limits are enforced host-side (16-char config name, 4/8-char bank names, 8 banks × 8 buttons × ≤10 commands, channel 1–16, duration a multiple of 10 ms up to 1270). `config_service.pack_project()` validates and then delegates to `flash_packer.pack()`, which assumes a valid project — call the former unless you have already validated.
 - **Device** (`device_service.py`) — MIDI. Scans ports via mido and calls anything with `STM` in the name compatible; uploads over the SysEx protocol above; `test_command()` sends a single command live for audition, expanding one stored command into the MIDI messages the firmware would emit.
 - **Firmware** (`device_service.py`) — DFU. Checks for `dfu-util`, can fetch it on Windows (pinned SourceForge URL, SHA-256 verified before extraction) or `brew install` it on macOS, and shells out to install firmware. Linux is deliberately manual — install `dfu-util` from your distro.
 
@@ -169,11 +176,13 @@ The `--device` argument in `_firmware_install_command()` is derived per file, no
 
 **Long operations are jobs.** Uploading, installing `dfu-util`, and installing firmware all return a `jobId` immediately and run on a daemon thread (`jobs.py`); the frontend's `useJob` hook polls `GET /api/jobs/{id}` every 500 ms until `completed`/`failed`. The store is a plain in-memory dict with no eviction — jobs die with the process, which is fine for a single-user local tool. Backend code inside a job reports by calling `job.log()`/setting `job.progress`; raising is how you fail it, and the exception message is what the user sees.
 
-**Project state lives in the browser.** `useStudioProject` keeps the whole project in `localStorage` under `midi-commander-studio:project:v1`, debounced 250 ms, and revalidates against the server 180 ms after every edit. The server holds no project state at all — every endpoint takes the full `StudioProject` in the request body. Clearing site data loses unsaved work; that's why the UI offers CSV export and a `.mcs.json` project file (the latter is just the serialised `StudioProject`, saved and reloaded entirely client-side — there is no endpoint for it).
+**Project state lives in the browser.** `useStudioProject` keeps the whole project in `localStorage` under `midi-commander-studio:project:v1`, debounced 250 ms, and revalidates against the server 180 ms after every edit. The server holds no project state at all — every endpoint takes the full `StudioProject` in the request body. Clearing site data loses unsaved work, and since the CSV removal the `.mcs.json` project file is the *only* way to get a configuration out of the browser — it is just the serialised `StudioProject`, saved and reloaded entirely client-side with no endpoint behind it. Open/Save project sit in the header for that reason.
 
 `models.py` is the schema shared across all of it: pydantic models on the backend, hand-mirrored in `studio/frontend/src/types.ts`. They are not generated from each other, so a field added to one must be added to the other.
 
-Two encoding quirks that must round-trip through the CSV: a suppressed CC off-value is written as `255` in the CSV but is `suppressOff: true` in the model (`0x80` on the wire), and `durationMs` is milliseconds in the model but 10 ms units in the CSV column. Sizes are derived, not restated. `config_service.FLASH_CONTENT_SIZE` computes the 2688-byte image from the layout constants — and takes the command count from `cmdBinaryPacker.MIDI_NUM_COMMANDS_PER_SWITCH` rather than repeating it — so `pack_project()` and `upload_configuration()` both check against the same derivation. `test_flash_layout_matches_firmware_header` greps `flash_midi_settings.h`/`.c` for `MIDI_ROM_CMD_SIZE`, `MIDI_NUM_COMMANDS_PER_SWITCH`, the `+32+96` pointer offsets, and `FLASH_SETTINGS_NO_PAGES`, and fails if the Python side has drifted from the C. That is the one piece of the C/Python contract with actual CI enforcement; everything else in the section above is still convention only.
+Note the model/wire unit split that survived the CSV removal: `durationMs` is milliseconds in the model but 10 ms units on the wire, and `suppressOff: true` becomes a byte above `0x7F`.
+
+Sizes are derived, not restated. `flash_packer.FLASH_CONTENT_SIZE` computes the 2688-byte image from the layout constants, so `pack()` and `upload_configuration()` both check the same derivation rather than a literal.
 
 ## CubeMX-generated code
 
@@ -188,8 +197,10 @@ Hand edits that live *outside* the USER CODE markers and would be lost to a rege
 
 Pin names (`SW_1_Pin`, `LED_A_GPIO_Port`, …) come from the `.ioc` and are the vocabulary `switch_router.c` is written in.
 
-## Configuration CSV format
+## The removed CSV path
 
-The template is a Google Sheet (linked in `README.md`); `python/MeloConfig_10_Cmds - RC-600.csv` is a checked-in copy. The parser splits the file into sections on lines containing `*` — `Global_Settings`, `Bank_Naming`, `Button_Settings` — and each becomes a pandas DataFrame. Per-command columns are prefixed `A_` through `J_` for the 10 commands. Note that comment stripping drops any line *containing* `#`, not just lines starting with it.
+Configuration was originally a CSV spreadsheet (a Google Sheet template) fed to `python/CSV_to_Flash.py`. That tool, the `python/` directory, and Studio's CSV import/export are all gone; `git log -- python/` has the history if you need the old format.
 
-There are two parsers for this format and they are not identical. `CSV_to_Flash.py` uses pandas and the `#`-anywhere rule above; Studio's `_read_sections()` in `config_service.py` uses the `csv` module and only skips rows whose *first cell* starts with `#`. Studio is also lenient where the CLI is not — it ignores unknown command types, rows with an out-of-range bank number, and missing columns, filling defaults instead of failing. A CSV that imports cleanly into Studio is therefore not proof that `CSV_to_Flash.py` will accept it, and vice versa. Studio's exporter writes the same section layout with a `# Generated by MIDI Commander Studio` header line.
+Don't reintroduce it. It is not a small feature: it was two divergent parsers, a `pandas` dependency, a column-name contract between the CSV headers and the encoder, and a set of representational quirks (a suppressed CC off-value spelled `255`, durations in 10 ms units) that existed only because the wire format had to survive a round-trip through spreadsheet columns. The planned configuration-model changes are what made that cost unpayable.
+
+The RC-600 configuration that used to live at `python/MeloConfig_10_Cmds - RC-600.csv` survives as a `StudioProject` in `studio/backend/tests/fixtures/rc600_reference.json`, where it now serves as the encoder's golden-image fixture.
