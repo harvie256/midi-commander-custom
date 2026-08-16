@@ -142,7 +142,7 @@ def start_dfu_install() -> dict[str, str]:
 def start_firmware_install(request: FirmwareInstallRequest) -> dict[str, str]:
     if not request.recoveryConfirmed:
         raise HTTPException(status_code=400, detail="Confirm that you have a stock recovery file.")
-    job = jobs.start("firmware-install", install_firmware)
+    job = jobs.start("firmware-install", lambda current: install_firmware(current, request.source))
     return {"jobId": job.id}
 
 

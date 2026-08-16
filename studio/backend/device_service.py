@@ -1,19 +1,22 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import platform
 import shutil
+import struct
 import subprocess
 import tempfile
 import time
 import urllib.request
 import zipfile
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import mido
 
-from .config_service import pack_project
+from .config_service import FLASH_CONTENT_SIZE, pack_project
 from .jobs import Job
 from .models import MidiCommand, StudioProject
 
@@ -25,7 +28,14 @@ WRITE_FLASH = 54
 WRITE_RESPONSE = 55
 RESET = 60
 REPO_ROOT = Path(__file__).resolve().parents[2]
-FIRMWARE_PATH = REPO_ROOT / "DFU" / "DFU_OUT" / "generated-20220424-163714.dfu"
+BUNDLED_FIRMWARE_PATH = REPO_ROOT / "DFU" / "DFU_OUT" / "generated-20220424-163714.dfu"
+BUILT_FIRMWARE_PATH = (
+    REPO_ROOT / "MIDI_Commander_Custom" / "build" / "DFU Release" / "MIDI_Commander_Custom.dfu"
+)
+# The STM32 system bootloader always enumerates as 0483:df11 in DFU mode.
+DFU_MODE_IDS = "0483:df11"
+DFU_SUFFIX_LENGTH = 16
+DFU_SUFFIX_SIGNATURE = b"UFD"
 STUDIO_TOOLS = REPO_ROOT / ".studio-tools"
 WINDOWS_DFU_DIR = STUDIO_TOOLS / "dfu-util"
 WINDOWS_DFU_PATH = WINDOWS_DFU_DIR / "dfu-util-static.exe"
@@ -34,6 +44,70 @@ WINDOWS_DFU_URL = (
 )
 WINDOWS_DFU_SHA256 = "683e78f661ff524186a64ab17d99fc6c3e9637811643ceecae37b791de89a901"
 WINDOWS_DRIVER_HELP_URL = "https://zadig.akeo.ie/"
+
+
+def _describe_firmware(source: str, path: Path) -> dict[str, Any]:
+    exists = path.exists()
+    return {
+        "source": source,
+        "name": path.name,
+        "path": str(path),
+        "description": (
+            "Local DFU Release build"
+            if source == "built"
+            else "Prebuilt firmware committed to the repository"
+        ),
+        "exists": exists,
+        "modified": (
+            datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat()
+            if exists
+            else None
+        ),
+    }
+
+
+def firmware_candidates() -> list[dict[str, Any]]:
+    return [
+        _describe_firmware("built", BUILT_FIRMWARE_PATH),
+        _describe_firmware("bundled", BUNDLED_FIRMWARE_PATH),
+    ]
+
+
+def resolve_firmware(source: str | None = None) -> tuple[Path, str]:
+    """Choose the .dfu to install.
+
+    A local `DFU Release` build wins over the committed prebuilt file, so that a
+    firmware change actually reaches the pedal instead of being silently ignored.
+    Pass an explicit source to pin the choice either way.
+    """
+    if source == "built":
+        return BUILT_FIRMWARE_PATH, "built"
+    if source == "bundled":
+        return BUNDLED_FIRMWARE_PATH, "bundled"
+    if source is not None:
+        raise ValueError(f"Unknown firmware source: {source}")
+    if BUILT_FIRMWARE_PATH.exists():
+        return BUILT_FIRMWARE_PATH, "built"
+    return BUNDLED_FIRMWARE_PATH, "bundled"
+
+
+def _dfu_suffix_ids(firmware: Path) -> tuple[int, int]:
+    """Return (idVendor, idProduct) from a DfuSe file's trailing 16-byte suffix.
+
+    Layout: bcdDevice, idProduct, idVendor, bcdDFU (all little-endian u16), then
+    the reversed "UFD" signature, the suffix length, and a CRC.
+    """
+    if firmware.stat().st_size < DFU_SUFFIX_LENGTH:
+        raise RuntimeError(f"{firmware.name} is too small to be a DfuSe file.")
+    with firmware.open("rb") as handle:
+        handle.seek(-DFU_SUFFIX_LENGTH, os.SEEK_END)
+        suffix = handle.read(DFU_SUFFIX_LENGTH)
+    if suffix[8:11] != DFU_SUFFIX_SIGNATURE:
+        raise RuntimeError(
+            f"{firmware.name} does not carry a DFU suffix; refusing to install it."
+        )
+    product, vendor = struct.unpack_from("<HH", suffix, 2)
+    return vendor, product
 
 
 def scan_midi_devices() -> dict[str, Any]:
@@ -72,8 +146,11 @@ def upload_configuration(
     job: Job,
 ) -> dict[str, Any]:
     flash_contents = pack_project(project)
-    if len(flash_contents) != 2688:
-        raise ValueError(f"Unexpected configuration size: {len(flash_contents)} bytes.")
+    if len(flash_contents) != FLASH_CONTENT_SIZE:
+        raise ValueError(
+            f"Unexpected configuration size: {len(flash_contents)} bytes, "
+            f"expected {FLASH_CONTENT_SIZE}."
+        )
 
     job.log(f"Opening MIDI input: {input_name}")
     input_port = mido.open_input(input_name)
@@ -186,8 +263,19 @@ def firmware_status() -> dict[str, Any]:
     executable = _dfu_util_path()
     install_supported, action_label = _dependency_action()
     current_platform = _platform_name()
+    firmware_path, firmware_source = resolve_firmware()
     common = {
         "platform": current_platform,
+        # Qualified so the selected file is unambiguous in the UI even when a
+        # local build has displaced the committed one.
+        "firmwareFile": (
+            f"{firmware_path.name} (local DFU Release build)"
+            if firmware_source == "built"
+            else firmware_path.name
+        ),
+        "firmwareExists": firmware_path.exists(),
+        "firmwareSource": firmware_source,
+        "firmwareSources": firmware_candidates(),
         "dependencyInstallSupported": install_supported,
         "dependencyActionLabel": action_label,
         "driverHelpUrl": WINDOWS_DRIVER_HELP_URL if current_platform == "Windows" else None,
@@ -204,8 +292,6 @@ def firmware_status() -> dict[str, Any]:
             "installed": False,
             "deviceDetected": False,
             "internalFlashDetected": False,
-            "firmwareFile": FIRMWARE_PATH.name,
-            "firmwareExists": FIRMWARE_PATH.exists(),
             "detail": "dfu-util is not installed.",
         }
     tool_error: str | None = None
@@ -235,8 +321,6 @@ def firmware_status() -> dict[str, Any]:
         "installed": True,
         "deviceDetected": detected,
         "internalFlashDetected": internal,
-        "firmwareFile": FIRMWARE_PATH.name,
-        "firmwareExists": FIRMWARE_PATH.exists(),
         "detail": detail,
     }
 
@@ -309,35 +393,44 @@ def install_dfu_util(job: Job) -> dict[str, Any]:
     return {"installed": True}
 
 
-def _firmware_install_command(executable: str) -> list[str]:
-    # The bundled DfuSe file records 0483:0000 in its suffix while the STM32
-    # bootloader enumerates as 0483:df11. dfu-util accepts separate runtime
-    # and DFU-mode identities, preserving an exact match for the live target
-    # without bypassing suffix validation with a force option.
+def _firmware_install_command(executable: str, firmware: Path) -> list[str]:
+    # dfu-util validates the file's own suffix identity against the runtime half
+    # of --device and matches the live target against the DFU-mode half. Those
+    # differ per file: the bundled DfuSe file records 0483:0000 while a freshly
+    # packed build records 0483:df11. Reading the runtime half out of the file
+    # keeps suffix validation on instead of reaching for a force option.
+    vendor, product = _dfu_suffix_ids(firmware)
     return [
         executable,
         "--device",
-        "0483:0000,0483:df11",
+        f"{vendor:04x}:{product:04x},{DFU_MODE_IDS}",
         "--alt",
         "0",
         "--download",
-        str(FIRMWARE_PATH),
+        str(firmware),
     ]
 
 
-def install_firmware(job: Job) -> dict[str, Any]:
+def install_firmware(job: Job, source: str | None = None) -> dict[str, Any]:
+    firmware, resolved = resolve_firmware(source)
     status = firmware_status()
     if not status["installed"]:
         raise RuntimeError("Install dfu-util first.")
     if not status["internalFlashDetected"]:
         raise RuntimeError("The expected alt 0 Internal Flash DFU target is not connected.")
-    if not FIRMWARE_PATH.exists():
-        raise RuntimeError("The bundled firmware file is missing.")
+    if not firmware.exists():
+        raise RuntimeError(
+            f"{firmware.name} is missing. Build the DFU Release preset, or select the "
+            "bundled firmware instead."
+            if resolved == "built"
+            else "The bundled firmware file is missing."
+        )
     executable = _dfu_util_path()
     assert executable is not None
-    job.log(f"Installing {FIRMWARE_PATH.name} to alt 0 Internal Flash…")
+    origin = "local DFU Release build" if resolved == "built" else "bundled firmware"
+    job.log(f"Installing {firmware.name} ({origin}) to alt 0 Internal Flash…")
     process = subprocess.Popen(
-        _firmware_install_command(executable),
+        _firmware_install_command(executable, firmware),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
@@ -352,4 +445,4 @@ def install_firmware(job: Job) -> dict[str, Any]:
     if return_code:
         raise RuntimeError(f"dfu-util exited with status {return_code}.")
     job.log("Firmware installed. Power-cycle the pedal normally, then upload a configuration.")
-    return {"firmware": FIRMWARE_PATH.name}
+    return {"firmware": firmware.name, "source": resolved}

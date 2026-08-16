@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 
 CommandType = Literal["PC", "CC", "Note", "PB", "Start", "Stop"]
+FirmwareSource = Literal["built", "bundled"]
 BUTTON_IDS = ("1", "2", "3", "4", "A", "B", "C", "D")
 
 
@@ -64,6 +65,8 @@ class TestCommandRequest(BaseModel):
 
 class FirmwareInstallRequest(BaseModel):
     recoveryConfirmed: bool
+    # Omitted means "prefer a local DFU Release build, else the bundled file".
+    source: FirmwareSource | None = None
 
 
 def starter_project() -> StudioProject:

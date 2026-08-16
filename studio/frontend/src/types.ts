@@ -61,13 +61,32 @@ export interface DeviceScan {
   connected: boolean
 }
 
+export type FirmwareSource = 'built' | 'bundled'
+
+export interface FirmwareCandidate {
+  source: FirmwareSource
+  name: string
+  path: string
+  description: string
+  exists: boolean
+  modified: string | null
+}
+
 export interface FirmwareStatus {
   platform: string
   installed: boolean
   deviceDetected: boolean
   internalFlashDetected: boolean
+  /** Display name of the resolved firmware, qualified when it is a local build. */
   firmwareFile: string
   firmwareExists: boolean
+  /**
+   * Which file the backend resolved; a local DFU Release build wins over the bundled one.
+   * Optional so that `dist/` stays valid without a rebuild — nothing renders these yet.
+   * Tighten to required when the Install step grows a source picker.
+   */
+  firmwareSource?: FirmwareSource
+  firmwareSources?: FirmwareCandidate[]
   detail: string
   dependencyInstallSupported: boolean
   dependencyActionLabel: string

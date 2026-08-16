@@ -29,6 +29,25 @@ from lib import cmdBinaryPacker as command_packer  # noqa: E402
 from lib import settingsBinaryPacker as settings_packer  # noqa: E402
 
 
+# Mirrors the flash layout fixed by MIDI_Commander_Custom/Core/Src/flash_midi_settings.c:
+#   pGlobalSettings  +0                            GLOBAL_SETTINGS_SIZE
+#   pBankStrings     +32    NUM_BANKS            * BANK_STRING_SIZE
+#   pSwitchCmds      +128   NUM_BANKS * buttons  * commands * MIDI_ROM_CMD_SIZE
+# The command count comes from the shared packer rather than being restated here,
+# and test_flash_layout_matches_firmware_header checks the rest against the C header.
+GLOBAL_SETTINGS_SIZE = 32
+BANK_STRING_SIZE = 12
+NUM_BANKS = 8
+MIDI_ROM_CMD_SIZE = 4
+FLASH_CONTENT_SIZE = (
+    GLOBAL_SETTINGS_SIZE
+    + NUM_BANKS * BANK_STRING_SIZE
+    + NUM_BANKS
+    * len(BUTTON_IDS)
+    * command_packer.MIDI_NUM_COMMANDS_PER_SWITCH
+    * MIDI_ROM_CMD_SIZE
+)
+
 COMMAND_LETTERS = tuple("ABCDEFGHIJ")
 COMMAND_FIELDS = (
     "CommandType",
@@ -88,8 +107,8 @@ def validate_project(project: StudioProject) -> list[dict[str, str]]:
     elif config_name_length > 16:
         error("globalSettings.configName", "Configuration name is limited to 16 characters.")
 
-    if len(project.banks) != 8:
-        error("banks", "The firmware requires exactly 8 banks.")
+    if len(project.banks) != NUM_BANKS:
+        error("banks", f"The firmware requires exactly {NUM_BANKS} banks.")
 
     for bank_index, bank in enumerate(project.banks):
         base = f"banks.{bank_index}"
@@ -105,16 +124,19 @@ def validate_project(project: StudioProject) -> list[dict[str, str]]:
             error(f"{base}.smallName", "Small line must use ASCII characters.")
         elif small_length > 8:
             error(f"{base}.smallName", "Small line is limited to 8 characters.")
-        if len(bank.buttons) != 8:
-            error(f"{base}.buttons", "Each bank requires exactly 8 buttons.")
+        if len(bank.buttons) != len(BUTTON_IDS):
+            error(f"{base}.buttons", f"Each bank requires exactly {len(BUTTON_IDS)} buttons.")
             continue
 
         for button_index, button in enumerate(bank.buttons):
             button_path = f"{base}.buttons.{button_index}"
             if button.id != BUTTON_IDS[button_index]:
                 error(button_path, f"Expected button {BUTTON_IDS[button_index]} in this position.")
-            if len(button.commands) > 10:
-                error(f"{button_path}.commands", "A button can contain at most 10 commands.")
+            if len(button.commands) > command_packer.MIDI_NUM_COMMANDS_PER_SWITCH:
+                error(
+                    f"{button_path}.commands",
+                    f"A button can contain at most {command_packer.MIDI_NUM_COMMANDS_PER_SWITCH} commands.",
+                )
             for command_index, command in enumerate(button.commands):
                 command_path = f"{button_path}.commands.{command_index}"
                 if command.type not in {"Start", "Stop"} and not 1 <= command.channel <= 16:
@@ -217,6 +239,11 @@ def pack_project(project: StudioProject) -> bytes:
     packed.extend(settings_packer.pack_bank_strings(bank_frame))
     for _, row in button_frame.iterrows():
         packed.extend(command_packer.pack_row(row.copy()))
+    if len(packed) != FLASH_CONTENT_SIZE:
+        raise ValueError(
+            f"Packed {len(packed)} bytes but the firmware flash layout expects "
+            f"{FLASH_CONTENT_SIZE}."
+        )
     return bytes(packed)
 
 
