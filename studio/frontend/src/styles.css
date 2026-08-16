@@ -268,6 +268,14 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid rgba(255, 1
 .verify-grid span { color: var(--muted); }
 .verify-grid code { color: #d6d5cf; font-size: 11px; }
 .compact-check { margin: 10px 0; }
+.firmware-source-picker { border: 1px solid var(--border); padding: 10px 13px 12px; margin: 0 0 12px; display: grid; gap: 8px; }
+.firmware-source-picker legend { color: var(--muted); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; padding: 0 5px; }
+.firmware-source { display: flex; align-items: flex-start; gap: 11px; font-size: 12px; cursor: pointer; }
+.firmware-source input { width: 15px; height: 15px; margin-top: 1px; accent-color: var(--accent); }
+.firmware-source > span { display: grid; gap: 3px; }
+.firmware-source code { color: #d6d5cf; font-size: 11px; }
+.firmware-source small { color: var(--muted); font-size: 11px; line-height: 1.45; }
+.firmware-source.selected code { color: var(--accent); }
 .safety-panel { padding: 22px; }
 .safety-panel > h2 { margin: 0 0 10px; color: var(--accent); font: 600 25px/1 "Barlow Condensed", sans-serif; letter-spacing: 0.06em; text-transform: uppercase; }
 .safety-item { display: grid; grid-template-columns: 62px 1fr; gap: 16px; align-items: center; padding: 21px 0; border-bottom: 1px solid var(--border); }

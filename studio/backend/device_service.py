@@ -266,13 +266,7 @@ def firmware_status() -> dict[str, Any]:
     firmware_path, firmware_source = resolve_firmware()
     common = {
         "platform": current_platform,
-        # Qualified so the selected file is unambiguous in the UI even when a
-        # local build has displaced the committed one.
-        "firmwareFile": (
-            f"{firmware_path.name} (local DFU Release build)"
-            if firmware_source == "built"
-            else firmware_path.name
-        ),
+        "firmwareFile": firmware_path.name,
         "firmwareExists": firmware_path.exists(),
         "firmwareSource": firmware_source,
         "firmwareSources": firmware_candidates(),

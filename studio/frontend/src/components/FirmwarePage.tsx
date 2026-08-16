@@ -1,21 +1,30 @@
 import { Battery, Check, ChevronDown, Cpu, ExternalLink, FileWarning, PackageOpen, RefreshCw, ShieldAlert, Usb, Zap } from 'lucide-react'
 import { useState } from 'react'
-import type { FirmwareStatus, JobState } from '../types'
+import type { FirmwareCandidate, FirmwareSource, FirmwareStatus, JobState } from '../types'
 
 interface Props {
   status: FirmwareStatus
   job: JobState | null
   recoveryConfirmed: boolean
+  selectedSource: FirmwareSource
+  onSourceChange: (source: FirmwareSource) => void
   onRecoveryChange: (confirmed: boolean) => void
   onRefresh: () => void
   onInstallDependency: () => void
   onInstallFirmware: () => void
 }
 
+function formatModified(modified: string | null) {
+  if (!modified) return 'not built'
+  return new Date(modified).toLocaleString()
+}
+
 export function FirmwarePage({
   status,
   job,
   recoveryConfirmed,
+  selectedSource,
+  onSourceChange,
   onRecoveryChange,
   onRefresh,
   onInstallDependency,
@@ -23,7 +32,10 @@ export function FirmwarePage({
 }: Props) {
   const [logOpen, setLogOpen] = useState(true)
   const running = job?.status === 'running'
-  const ready = status.internalFlashDetected && status.firmwareExists && recoveryConfirmed && !running
+  const choices = status.firmwareSources.filter((candidate) => candidate.exists)
+  const selected: FirmwareCandidate | undefined =
+    choices.find((candidate) => candidate.source === selectedSource) ?? choices[0]
+  const ready = status.internalFlashDetected && Boolean(selected) && recoveryConfirmed && !running
 
   return (
     <main className="firmware-page">
@@ -45,7 +57,24 @@ export function FirmwarePage({
           <button className="button text-button" onClick={onRefresh}><RefreshCw size={16} /> Check again</button>
         </FirmwareStep>
         <FirmwareStep number={4} title="Install" active={ready}>
-          <div className="verify-grid"><span>Bundled file</span><code>{status.firmwareFile}</code><span>Start address</span><code>0x08003000</code></div>
+          {choices.length > 1 && <fieldset className="firmware-source-picker">
+            <legend>Firmware to install</legend>
+            {choices.map((candidate) => (
+              <label key={candidate.source} className={`firmware-source ${selected?.source === candidate.source ? 'selected' : ''}`}>
+                <input
+                  type="radio"
+                  name="firmware-source"
+                  value={candidate.source}
+                  checked={selected?.source === candidate.source}
+                  disabled={running}
+                  onChange={() => onSourceChange(candidate.source)}
+                />
+                <span><code>{candidate.name}</code><small>{candidate.description} · {formatModified(candidate.modified)}</small></span>
+              </label>
+            ))}
+          </fieldset>}
+          <div className="verify-grid"><span>Selected file</span><code>{selected?.name ?? status.firmwareFile}</code><span>Start address</span><code>0x08003000</code></div>
+          {!selected && <p className="platform-note">No firmware file is available. Build the <code>DFU Release</code> preset, or restore the bundled <code>.dfu</code>.</p>}
           <label className="check-row compact-check"><input type="checkbox" checked={recoveryConfirmed} onChange={(event) => onRecoveryChange(event.target.checked)} /><span>I have a stock firmware recovery file.</span></label>
           {running && <div className="progress-track"><span style={{ width: `${job.progress}%` }} /></div>}
           <button className="button primary wide" disabled={!ready} onClick={onInstallFirmware}><Cpu size={18} /> {running ? 'Installing firmware…' : 'Install firmware'}</button>
@@ -57,7 +86,7 @@ export function FirmwarePage({
         <SafetyItem icon={<Cpu />} title="Development firmware">This build is intended for testing and development.</SafetyItem>
         <SafetyItem icon={<Zap />} title="Expression inputs are not supported">Expression pedal and EXP jacks are not functional.</SafetyItem>
         <SafetyItem icon={<Battery />} title="Battery behavior is unverified">Battery life and charging behavior may be affected.</SafetyItem>
-        <SafetyItem icon={<FileWarning />} title="Do not flash backup/dumped_firmware.bin">Only flash the bundled custom DFU from this workflow.</SafetyItem>
+        <SafetyItem icon={<FileWarning />} title="Do not flash backup/dumped_firmware.bin">Only flash a custom DFU offered by this workflow.</SafetyItem>
       </aside>
 
       <section className="log-panel firmware-log">

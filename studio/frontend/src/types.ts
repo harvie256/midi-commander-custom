@@ -77,16 +77,12 @@ export interface FirmwareStatus {
   installed: boolean
   deviceDetected: boolean
   internalFlashDetected: boolean
-  /** Display name of the resolved firmware, qualified when it is a local build. */
+  /** File name of the resolved firmware. */
   firmwareFile: string
   firmwareExists: boolean
-  /**
-   * Which file the backend resolved; a local DFU Release build wins over the bundled one.
-   * Optional so that `dist/` stays valid without a rebuild — nothing renders these yet.
-   * Tighten to required when the Install step grows a source picker.
-   */
-  firmwareSource?: FirmwareSource
-  firmwareSources?: FirmwareCandidate[]
+  /** Which file the backend resolved; a local DFU Release build wins over the bundled one. */
+  firmwareSource: FirmwareSource
+  firmwareSources: FirmwareCandidate[]
   detail: string
   dependencyInstallSupported: boolean
   dependencyActionLabel: string

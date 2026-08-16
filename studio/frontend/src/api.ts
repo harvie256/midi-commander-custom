@@ -1,5 +1,6 @@
 import type {
   DeviceScan,
+  FirmwareSource,
   FirmwareStatus,
   JobState,
   MidiCommand,
@@ -46,8 +47,8 @@ export const api = {
   testCommand: (outputName: string, command: MidiCommand) =>
     postJson<{ sent: boolean }>('/api/commands/test', { outputName, command }),
   installDfuUtil: () => postJson<{ jobId: string }>('/api/firmware/install-dfu-util', {}),
-  installFirmware: (recoveryConfirmed: boolean) =>
-    postJson<{ jobId: string }>('/api/firmware/install', { recoveryConfirmed }),
+  installFirmware: (recoveryConfirmed: boolean, source: FirmwareSource | null) =>
+    postJson<{ jobId: string }>('/api/firmware/install', { recoveryConfirmed, source }),
   shutdown: () => postJson<{ stopping: boolean }>('/api/shutdown', {}),
   importCsv: async (file: File) => {
     const data = new FormData()

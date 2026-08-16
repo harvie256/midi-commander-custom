@@ -8,7 +8,7 @@ import { ProjectSettingsDialog } from './components/ProjectSettingsDialog'
 import { Toast } from './components/Toast'
 import { useJob } from './hooks/useJob'
 import { useStudioProject } from './hooks/useStudioProject'
-import type { AppPage, DeviceScan, FirmwareStatus, MidiCommand, StudioProject } from './types'
+import type { AppPage, DeviceScan, FirmwareSource, FirmwareStatus, MidiCommand, StudioProject } from './types'
 
 const EMPTY_DEVICES: DeviceScan = {
   inputs: [], outputs: [], compatibleInputs: [], compatibleOutputs: [], connected: false,
@@ -21,6 +21,8 @@ const EMPTY_FIRMWARE: FirmwareStatus = {
   internalFlashDetected: false,
   firmwareFile: 'generated-20220424-163714.dfu',
   firmwareExists: true,
+  firmwareSource: 'bundled',
+  firmwareSources: [],
   detail: 'Checking firmware tools…',
   dependencyInstallSupported: false,
   dependencyActionLabel: 'Install dfu-util',
@@ -50,6 +52,8 @@ export default function App() {
   const [uploadJobId, setUploadJobId] = useState<string | null>(null)
   const [firmwareJobId, setFirmwareJobId] = useState<string | null>(null)
   const [recoveryConfirmed, setRecoveryConfirmed] = useState(false)
+  // null means "let the backend choose" — a local DFU Release build over the bundled file.
+  const [firmwareSource, setFirmwareSource] = useState<FirmwareSource | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [toast, setToast] = useState<{ message: string; tone: 'success' | 'error' | 'info' } | null>(null)
   const csvInput = useRef<HTMLInputElement>(null)
@@ -169,7 +173,7 @@ export default function App() {
 
   const installFirmware = async () => {
     try {
-      const result = await api.installFirmware(recoveryConfirmed)
+      const result = await api.installFirmware(recoveryConfirmed, firmwareSource)
       setFirmwareJobId(result.jobId)
     } catch (error) {
       show(error instanceof Error ? error.message : 'Could not start firmware install.', 'error')
@@ -230,6 +234,8 @@ export default function App() {
       status={firmware}
       job={firmwareJob}
       recoveryConfirmed={recoveryConfirmed}
+      selectedSource={firmwareSource ?? firmware.firmwareSource}
+      onSourceChange={setFirmwareSource}
       onRecoveryChange={setRecoveryConfirmed}
       onRefresh={() => void refreshFirmware()}
       onInstallDependency={() => void installDependency()}
