@@ -154,11 +154,18 @@ Then prepare a Python environment as follows:
 
    ```
    cd /path/to/midi-commander-custom
-   python3 -m pip install -r python/requirements.txt
-   python3 python/CSV_to_Flash.py -h
+   python3 -m venv python/.venv
+   python/.venv/bin/python -m pip install -r python/requirements.txt
+   python/.venv/bin/python python/CSV_to_Flash.py -h
    ```
 
+   On Windows the interpreter is at `python\.venv\Scripts\python.exe` instead.
+
    If your setup is successful, the last command should display the help message of the tool.
+
+   The virtual environment is not just tidiness: current Debian and Ubuntu mark
+   the system Python as externally managed (PEP 668) and refuse `pip install`
+   into it, with or without `sudo`.
 
 Once your Python environment is operational, you can load your configuration onto the Midi Commander as follows:
 

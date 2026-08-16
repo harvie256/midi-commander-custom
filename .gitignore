@@ -47,6 +47,7 @@ dkms.conf
 
 # MIDI Commander Studio local runtime
 .studio-venv*/
+.venv/
 .studio-runtime/
 .studio-tools/
 studio/frontend/node_modules/

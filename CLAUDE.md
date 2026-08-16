@@ -57,11 +57,16 @@ Only the DFU variant gets packed, deliberately — a `Debug` build is linked at 
 **Python tooling:**
 
 ```
-python3 -m pip install -r python/requirements.txt
-python3 python/CSV_to_Flash.py <config.csv>
+python3 -m venv python/.venv
+python/.venv/bin/python -m pip install -r python/requirements.txt
+python/.venv/bin/python python/CSV_to_Flash.py <config.csv>
 ```
 
-On Linux, `python-rtmidi` needs `libjack-dev` and `libasound2-dev` first — see `python/linux-prerequisites.sh`. Python is formatted with Black and type-checked with mypy in basic mode (`.vscode/`); mido's dynamic symbols require `# type: ignore` on its call sites.
+A venv is not optional on current Debian/Ubuntu: the system interpreter is marked externally managed (PEP 668), so `pip install` into it is refused with or without `sudo`, and `--user` is refused too.
+
+On Linux, `python-rtmidi` also needs `libasound2-dev` before it will build — `python/linux-prerequisites.sh` installs it and creates the venv. It is compiled from source whenever no wheel matches your Python (there is none for 3.14, which is what Ubuntu 26.04 ships), so this bites on new distributions rather than being a one-off. JACK is optional; ALSA is the hard requirement. **Install `libjack-jackd2-dev`, never `libjack-dev`** — the latter is JACK1, and apt satisfies it by removing the JACK2 runtime the rest of the desktop audio stack depends on.
+
+Python is formatted with Black and type-checked with mypy in basic mode (`.vscode/`); mido's dynamic symbols require `# type: ignore` on its call sites.
 
 **Studio:** the launcher scripts are the supported entry point — they create the venv, install `studio/requirements.txt`, start the backend detached, and open the browser at `http://127.0.0.1:8765`. Each OS gets its own venv directory (`.studio-venv` on macOS, `.studio-venv-linux`, `.studio-venv-windows`) because a venv is not portable across platforms; all three are gitignored, along with `.studio-runtime/` (logs and the server PID) and `.studio-tools/`.
 
