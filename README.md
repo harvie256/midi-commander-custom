@@ -1,3 +1,9 @@
+# Status
+I don't maintain this repo any futher. There are a number of forks out that have added many features and fixed bugs.
+
+This archive is only here for historical purposes and I suggest looking at one of the other forks to use in your device.
+
+
 # midi-commander-custom
 Custom Firmware for the MeloAudio Midi Commander
 
